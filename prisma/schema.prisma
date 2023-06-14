@@ -7,12 +7,22 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "mysql"
     url      = env("DATABASE_URL")
+    relationMode = "prisma"
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Recipe {
+    id           String   @id @default(cuid())
+    authorId     String
+    name         String   @db.VarChar(64)
+
+    createdAt    DateTime @default(now())
+    starRating   Decimal  @default(0.0)
+    description  String   @db.VarChar(255)
+    instructions String
+    
+
+    @@index([authorId])
+    // TODO
 }
