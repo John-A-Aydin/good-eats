@@ -1,10 +1,9 @@
-import { Recipe } from "@prisma/client";
+import type { Recipe } from "@prisma/client";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { filterUserForClient } from "~/server/helpers/filterUserForClient";
-
 
 const addUserDataToRecipes = async (recipes: Recipe[]) => {
   const users = (
@@ -45,6 +44,59 @@ export const recipeRouter = createTRPCRouter({
       take: 100,
       orderBy: [{ createdAt: "desc"}],
     });
-    return recipes; // TODO user data?
+
+    return addUserDataToRecipes(recipes);
+  }),
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const recipe = await ctx.prisma.recipe.findUnique({
+        where: { id: input.id }
+      });
+
+      if (!recipe) throw new TRPCError({ code: "NOT_FOUND"});
+
+      return (await addUserDataToRecipes([recipe]))[0];
+    }),
+  create: privateProcedure
+    .input( 
+      // zod input validation
+      z.object({
+        name: z.string().min(1).max(64),
+        description: z.string().min(1).max(255),
+        instructions: z.string(),
+        // TODO change up the nutrion formating
+        carbs: z.number().optional(),
+        protien: z.number().optional(),
+        fat: z.number().optional(),
+      })
+    )
+    .mutation(async({ctx, input}) => {
+    /** 
+     * Grabbing the current user's ID.
+     * Since this is a private procedure and we made sure the current user exists
+     * ../trcp.ts enforceUserIsAuthed()
+    */
+    const authorId = ctx.userId;
+    
+    
+    // TODO Rate limiting on posts
+    // const { success } = await ratelimit.limit(authorId);
+    // if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" })
+
+    const post = await ctx.prisma.recipe.create({
+      data: {
+        authorId,
+        name: input.name,
+        starRating: 0,
+        description: input.description,
+        instructions: input.instructions,
+        // TODO change nutrition
+        carbs: input.carbs,
+        protien: input.protien,
+        fat: input.fat,
+      }
+    })
+    return post;
   }),
 });
