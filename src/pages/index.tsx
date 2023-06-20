@@ -50,13 +50,30 @@ const CreateRecipeWizard = () => {
     }
   }
   return (
-    <form onSubmit={handleSubmit} className="flex-col">
-      <h3>Name :</h3> <input type="text" name="name" onChange={handleChange}/>
-      <h3>Description :</h3> <textarea name="description" onChange={handleChange}></textarea> 
-      {/* <input type="text" name="description" onChange={handleChange}/> */}
-      <h3>Instructions :</h3> <textarea name="instructions" onChange={handleChange}></textarea>  
-      {/* <input type="text" name="instructions" onChange={handleChange}/> */}
-      <button type="submit">Post</button>
+    <form onSubmit={handleSubmit} className="flex flex-col bg-gray-900 text-white rounded-md w-8/12">
+      <h3>Name :</h3>
+      <input
+        type="text"
+        name="name"
+        onChange={handleChange}
+        className="bg-gray-800 rounded-md m-4 border-[1px] border-gray-400"
+        placeholder=" Give your recipe a unique name"
+      />
+      <h3>Description :</h3>
+      <textarea
+        name="description"
+        onChange={handleChange}
+        className="bg-gray-800 h-24 rounded-md m-4 border-[1px] border-gray-400"
+        placeholder=" Write about your inspiration for the dish or about its flavor"
+      /> 
+      <h3>Instructions :</h3>
+      <textarea
+        name="instructions"
+        onChange={handleChange}
+        className="bg-gray-800 h-96 rounded-md m-4 border-[1px] border-gray-400"
+        placeholder=" Write detailed instructions with clear steps"
+      />
+      <button type="submit" className="bg-gray-800 w-16 rounded-full">Post</button>
     </form>
   );
 };
@@ -140,9 +157,11 @@ const Home: NextPage = () => {
         <meta name="description" content="Recipe sharing website with a focus on fitness" />
         <link rel="icon" href="/favicon.jpg" /> 
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center">
+      <main className="flex flex-col h-screen items-center bg-gray-900">
         <SignIn/>
-        <UserButton/>
+        <div className="flex w-full justify-end p-4">
+          <UserButton />
+        </div>
         <CreateRecipeWizard />
       </main>
     </>
