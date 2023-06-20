@@ -19,7 +19,8 @@ import { prisma } from "~/server/db";
 import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { getAuth } from "@clerk/nextjs/dist/types/server-helpers.server";
+import { getAuth } from "@clerk/nextjs/server";
+
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request
