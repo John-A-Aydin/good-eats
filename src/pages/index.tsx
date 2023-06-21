@@ -8,7 +8,7 @@ import { api } from "~/utils/api";
 import toast from 'react-hot-toast';
 import { RecipePreview } from "~/components/recipepreview";
 
-const CreateRecipeWizard = () => {
+const CreateRecipeWizard = () => { // TODO clear input fields on submit
   const { user } = useUser();
   const ctx = api.useContext();
   const [postInfo, setPostInfo] = useState({

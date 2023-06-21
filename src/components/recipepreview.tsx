@@ -34,7 +34,7 @@ export const RecipePreview = (props: RecipeWithUser) => {
         height={56}
       />
     </div>
-    <p className="text-xl">{recipe.description}</p>
+    <p className="">{recipe.description}</p>
   </div>
   );
 };
