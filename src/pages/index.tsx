@@ -3,9 +3,10 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useState } from "react";
-import { LoadingSpinner } from "~/components/loading";
+import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { api } from "~/utils/api";
 import toast from 'react-hot-toast';
+import { RecipePreview } from "~/components/recipepreview";
 
 const CreateRecipeWizard = () => {
   const { user } = useUser();
@@ -50,7 +51,7 @@ const CreateRecipeWizard = () => {
     }
   }
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col bg-gray-900 text-white rounded-md w-8/12">
+    <form onSubmit={handleSubmit} className="flex flex-col bg-gray-900 rounded-md w-8/12">
       <h3>Name :</h3>
       <input
         type="text"
@@ -146,6 +147,21 @@ const CreatePostWizard = () => {
   );
 };
 
+const Feed = () => {
+  const {data, isLoading: postsLoading } = api.recipe.getAll.useQuery();
+
+  if (postsLoading) return <LoadingPage />
+
+  if (!data) return <div>Something went wrong</div>
+  return (
+    <div className="flex flex-col w-8/12">
+      {data.map((fullRecipe) => (
+        <RecipePreview {...fullRecipe} key={fullRecipe.recipe.id}/>
+        
+      ))}
+    </div>
+  );
+};
 
 const Home: NextPage = () => {
 
@@ -157,12 +173,13 @@ const Home: NextPage = () => {
         <meta name="description" content="Recipe sharing website with a focus on fitness" />
         <link rel="icon" href="/favicon.jpg" /> 
       </Head>
-      <main className="flex flex-col h-screen items-center bg-gray-900">
+      <main className="flex flex-col h-screen items-center">
         <SignIn/>
         <div className="flex w-full justify-end p-4">
           <UserButton />
         </div>
         <CreateRecipeWizard />
+        <Feed />
       </main>
     </>
   );
