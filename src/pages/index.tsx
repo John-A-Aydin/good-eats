@@ -36,7 +36,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     },
   });
   
-  const handleChange = (e) => {
+  const handleChange = (e: any) => { // TODO fix e type
     
     const name = e.target.name;
     const value = e.target.value;
@@ -44,7 +44,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
       return {...prev, [name]: value}
     });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => { // TODO fix e type
     e.preventDefault();
     if (postInfo.name !== "" && postInfo.description !== "" && postInfo.instructions !== "") {
       mutate(postInfo)
