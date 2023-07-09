@@ -18,9 +18,11 @@ model Recipe {
     name         String   @db.VarChar(64)
 
     createdAt    DateTime @default(now())
-    starRating   Float  @default(0.0)
+    starRating   Float    @default(0.0)
     description  String   @db.VarChar(255)
     instructions String
+
+    pics         RecipePics[] 
 
     // TODO - Make nutrition info either seperate model with relation or an object
     carbs        Float?
@@ -35,6 +37,13 @@ model Recipe {
     // TODO figure out what this is
 }
 
+model RecipePics {  // CAREFULL: untested
+    url           String   @id
+    recipe        Recipe   @relation(fields: [recipeId], references: [id])
+    recipeId      String
+
+    @@index([recipeId])
+}
 
 
 
