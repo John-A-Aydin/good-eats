@@ -3,7 +3,6 @@
 
 generator client {
     provider = "prisma-client-js"
-    previewFeatures = ["jsonProtocol"]
 }
 
 datasource db {
@@ -25,9 +24,9 @@ model Recipe {
     pics         RecipePics[] 
 
     // TODO - Make nutrition info either seperate model with relation or an object
-    carbs        Float?
-    protien      Float?
-    fat          Float?
+    //carbs        Float?
+    //protien      Float?
+    //fat          Float?
     
 
     // TODO tags?
@@ -38,9 +37,10 @@ model Recipe {
 }
 
 model RecipePics {  // CAREFULL: untested
+    id            Int
     url           String   @id
     recipe        Recipe   @relation(fields: [recipeId], references: [id])
-    recipeId      String
+    recipeId      String   
 
     @@index([recipeId])
 }

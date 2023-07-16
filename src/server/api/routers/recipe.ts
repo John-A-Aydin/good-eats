@@ -4,6 +4,7 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/ap
 import { TRPCError } from "@trpc/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { filterUserForClient } from "~/server/helpers/filterUserForClient";
+import {generateUploadUrl} from "~/server/s3"
 
 const addUserDataToRecipes = async (recipes: Recipe[]) => {
   const users = (
@@ -39,13 +40,14 @@ const addUserDataToRecipes = async (recipes: Recipe[]) => {
 }
 
 export const recipeRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    const recipes = await ctx.prisma.recipe.findMany({
-      take: 100,
-      orderBy: [{ createdAt: "desc"}],
-    });
+  getAll: publicProcedure
+    .query(async ({ ctx }) => {
+      const recipes = await ctx.prisma.recipe.findMany({
+        take: 100,
+        orderBy: [{ createdAt: "desc"}],
+      });
 
-    return addUserDataToRecipes(recipes);
+      return addUserDataToRecipes(recipes);
   }),
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
@@ -57,7 +59,7 @@ export const recipeRouter = createTRPCRouter({
       if (!recipe) throw new TRPCError({ code: "NOT_FOUND"});
 
       return (await addUserDataToRecipes([recipe]))[0];
-    }),
+  }),
   create: privateProcedure
     .input( 
       // zod input validation
@@ -92,11 +94,12 @@ export const recipeRouter = createTRPCRouter({
         description: input.description,
         instructions: input.instructions,
         // TODO change nutrition
-        carbs: input.carbs,
-        protien: input.protien,
-        fat: input.fat,
       }
     })
     return post;
   }),
+  getUploadUrl: privateProcedure
+    .query(async () => { // Todo add ctx??
+      return generateUploadUrl();
+    }),
 });

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "~/utils/api";
 import toast from 'react-hot-toast';
 
+
 const CreateRecipeWizard = () => { // TODO clear input fields on submit
   const { user } = useUser();
   const ctx = api.useContext();
@@ -13,7 +14,8 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     instructions: ""
   });
   const { mutate, isLoading: isPosting} = api.recipe.create.useMutation({
-    onSuccess: () => { // If post is successfull clear the input and invalidate something 
+    // If post is successfull clear the input and invalidate something 
+    onSuccess: () => {
       setPostInfo({
         name: "",
         description: "",
@@ -21,7 +23,8 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
       });
       void ctx.recipe.getAll.invalidate();
     },
-    onError: (e) => { // If something goes wrong with post or zod denies content, post message
+    // If something goes wrong with post or zod denies content, post message
+    onError: (e) => {
       // Grabs error message from zod and prints it
       const errorMessage = e.data?.zodError?.fieldErrors.content;
       if (errorMessage && errorMessage[0]) {
@@ -47,30 +50,30 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     }
   }
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col bg-gray-900 rounded-md w-8/12">
+    <form onSubmit={handleSubmit} className="flex flex-col rounded-md w-8/12">
       <h3>Name :</h3>
       <input
         type="text"
         name="name"
         onChange={handleChange}
-        className="bg-gray-800 rounded-md m-4 border-[1px] border-gray-400"
+        className="bg-neutral-800 rounded-md m-4 border-[1px] border-gray-400"
         placeholder=" Give your recipe a unique name"
       />
       <h3>Description :</h3>
       <textarea
         name="description"
         onChange={handleChange}
-        className="bg-gray-800 h-24 rounded-md m-4 border-[1px] border-gray-400"
+        className="bg-neutral-800 h-24 rounded-md m-4 border-[1px] border-gray-400"
         placeholder=" Write about your inspiration for the dish or about its flavor"
       /> 
       <h3>Instructions :</h3>
       <textarea
         name="instructions"
         onChange={handleChange}
-        className="bg-gray-800 h-96 rounded-md m-4 border-[1px] border-gray-400"
+        className="bg-neutral-800 h-96 rounded-md m-4 border-[1px] border-gray-400"
         placeholder=" Write detailed instructions with clear steps"
       />
-      <button type="submit" className="bg-gray-800 w-16 rounded-full">Post</button>
+      <button type="submit" className="bg-neutral-800 w-16 rounded-full">Post</button>
     </form>
   );
 };
