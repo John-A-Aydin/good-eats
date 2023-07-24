@@ -37,7 +37,6 @@ model Recipe {
 }
 
 model RecipePics {  // CAREFULL: untested
-    id            Int
     url           String   @id
     recipe        Recipe   @relation(fields: [recipeId], references: [id])
     recipeId      String   
