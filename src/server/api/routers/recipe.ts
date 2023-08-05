@@ -6,16 +6,17 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { filterUserForClient } from "~/server/helpers/filterUserForClient";
 
 import { env } from "~/env.mjs";
-import aws from "aws-sdk";
+import S3 from "aws-sdk/clients/s3";
 import { createId } from "@paralleldrive/cuid2";
 
 const UPLOAD_MAX_FILE_SIZE = 1_000_000;
 
 // TODO web dev cody vid figure out wtf is going on
-const s3 = new aws.S3({
-  region: "us-east-1",
+const s3 = new S3({
+  apiVersion: "2006-03-01",
   accessKeyId: env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: env.AWS_RECIPE_BUCKET_NAME,
+  secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+  region: "us-east-1",
   signatureVersion: 'v4',
 });
 
@@ -80,7 +81,7 @@ export const recipeRouter = createTRPCRouter({
         name: z.string().min(1).max(64),
         description: z.string().min(1).max(255),
         instructions: z.string(),
-        imageIds: z.string().array(),
+        imageTypes: z.string().array(),
         // TODO change up the nutrion formating
       })
     )
@@ -96,7 +97,7 @@ export const recipeRouter = createTRPCRouter({
     // TODO Rate limiting on posts
     // const { success } = await ratelimit.limit(authorId);
     // if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" })
-
+    
     const post = await ctx.prisma.recipe.create({
       data: {
         authorId,
@@ -107,23 +108,40 @@ export const recipeRouter = createTRPCRouter({
         // TODO change nutrition
       }
     })
-    return post;
-  }),
-  createPresignedUrl: privateProcedure
-    .input(z.object({ type: z.string() }))
-    .query(async ({ input }) => { // Todo add ctx??
-      const imageId = createId();
 
+    /*
+      Creates presigned urls for image uploads and adds image data to database
+
+      POSSIBLE ISSUE: If the client fails to upload pictures after mutation is called,
+      there will be images in the database with no image associated with thier url.
+     */
+    
+    const unawaitedPresignedURLArray = input.imageTypes.map(async (type) => {
+      // Creating presigned url
+      const id = createId();
       const params = ({
         Bucket: env.AWS_RECIPE_BUCKET_NAME,
-        Key: imageId,
+        Key: id,
         Expires: 1800, // 30 minutes (may need to change)
-        ContentType: input.type
+      }) // May need to add beck content type
+      const presignedURL = await s3.getSignedUrl('putObject', params);
+      
+      if(!presignedURL) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
+      // Creates image data in database
+      console.log(presignedURL + "                                               1");
+      await ctx.prisma.recipePics.create({
+        data: {
+          url: `${env.AWS_RECIPE_BUCKET_URL}${id}`,
+          recipe: {
+            connect: {
+              id: post.id,
+            },
+          },
+        },
       });
-
-      const uploadURL = await s3.getSignedUrlPromise('putObject', params);
-      const data = {uploadURL, imageId};
-      if(!data) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
-      return data;
+      return presignedURL;
+    });
+    const presignedURLArray = await Promise.all(unawaitedPresignedURLArray)
+    return {post, presignedURLArray};
   }),
 });

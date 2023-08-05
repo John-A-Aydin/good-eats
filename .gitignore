@@ -43,3 +43,6 @@ yarn-error.log*
 
 # vscode
 /.vscode
+
+#super cool secret stuff'
+/temp

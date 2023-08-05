@@ -12,6 +12,7 @@ export const env = createEnv({
     AWS_ACCESS_KEY_ID: z.string(),
     AWS_SECRET_ACCESS_KEY: z.string(),
     AWS_RECIPE_BUCKET_NAME: z.string(),
+    AWS_RECIPE_BUCKET_URL: z.string(),
   },
 
   /**
@@ -34,6 +35,7 @@ export const env = createEnv({
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
     AWS_RECIPE_BUCKET_NAME: process.env.AWS_RECIPE_BUCKET_NAME,
+    AWS_RECIPE_BUCKET_URL: process.env.AWS_RECIPE_BUCKET_URL,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
