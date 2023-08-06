@@ -9,6 +9,24 @@ import { env } from "~/env.mjs";
 import S3 from "aws-sdk/clients/s3";
 import { createId } from "@paralleldrive/cuid2";
 
+type RecipesWithPics = (
+  {
+    pics: {
+      url: string;
+      recipeId: string;
+    }[];
+  } & {
+    id: string;
+    authorId: string;
+    name: string;
+    createdAt: Date;
+    starRating: number;
+    description: string;
+    instructions: string;
+  }
+)
+
+
 const UPLOAD_MAX_FILE_SIZE = 1_000_000;
 
 // TODO web dev cody vid figure out wtf is going on
@@ -20,7 +38,7 @@ const s3 = new S3({
   signatureVersion: 'v4',
 });
 
-const addUserDataToRecipes = async (recipes: Recipe[]) => {
+const addUserDataToRecipes = async (recipes: RecipesWithPics[]) => {
   const users = (
     await clerkClient.users.getUserList({
       userId: recipes.map((recipe) => recipe.authorId),
@@ -53,12 +71,18 @@ const addUserDataToRecipes = async (recipes: Recipe[]) => {
   });
 }
 
+
+
+
 export const recipeRouter = createTRPCRouter({
   getAll: publicProcedure
     .query(async ({ ctx }) => {
       const recipes = await ctx.prisma.recipe.findMany({
         take: 100,
         orderBy: [{ createdAt: "desc"}],
+        include: {
+          pics: true,
+        },
       });
 
       return addUserDataToRecipes(recipes);
@@ -67,7 +91,10 @@ export const recipeRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const recipe = await ctx.prisma.recipe.findUnique({
-        where: { id: input.id }
+        where: { id: input.id },
+        include: {
+          pics: true,
+        },
       });
 
       if (!recipe) throw new TRPCError({ code: "NOT_FOUND"});

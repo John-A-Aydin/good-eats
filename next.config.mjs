@@ -9,7 +9,7 @@ const config = {
   reactStrictMode: true,
 
   images: {
-    domains: ['images.clerk.dev']
+    domains: ['images.clerk.dev', 'good-eats-recipe-pics.s3.amazonaws.com']
   },
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config

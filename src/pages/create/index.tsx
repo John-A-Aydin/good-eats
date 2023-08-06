@@ -10,6 +10,8 @@ import axios from "axios";
     - FIGURE OUT HOW TO ACCESS MUTATION RETURN VALUES
     - Fix all TODO's
     - Post button should not show unless all requirements are fulfilled
+    - Fix deleteHandler
+    - crop images to 1200x1200?
 
 */
 
