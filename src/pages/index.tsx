@@ -7,7 +7,7 @@ import { useState } from "react";
 import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { api } from "~/utils/api";
 import toast from 'react-hot-toast';
-import { RecipePreview } from "~/components/recipepreview";
+import { RecipePreview } from "~/components/recipePreview";
 
 const Feed = () => {
   const {data, isLoading: postsLoading } = api.recipe.getAll.useQuery();

@@ -26,6 +26,10 @@ type RecipesWithPics = (
   }
 )
 
+/*
+  TODO's
+   - Ratelimit
+*/
 
 const UPLOAD_MAX_FILE_SIZE = 1_000_000;
 
@@ -51,7 +55,7 @@ const addUserDataToRecipes = async (recipes: RecipesWithPics[]) => {
 
     if (!author ) 
       throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
+        code: "NOT_FOUND",
         message: "Author for recipe not found"
       });
     
@@ -97,9 +101,51 @@ export const recipeRouter = createTRPCRouter({
         },
       });
 
-      if (!recipe) throw new TRPCError({ code: "NOT_FOUND"});
+      if (!recipe) throw new TRPCError({ code: "NOT_FOUND" });
 
       return (await addUserDataToRecipes([recipe]))[0];
+  }),
+  getByUserId: publicProcedure
+    .input(z.object({ userId: z.string()}))
+    .query(async ({ ctx, input }) => {
+      const recipes = await ctx.prisma.recipe.findMany({
+        where: { authorId: input.userId },
+        take: 100,
+        orderBy: [{ createdAt: "desc" }],
+        include: { pics: true },
+      });
+      return (await addUserDataToRecipes(recipes));
+  }),
+  getByUsernameAndId: publicProcedure
+    .input(z.object({
+      username: z.string(),
+      id: z.string(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const [user] = await clerkClient.users.getUserList({
+        username: [input.username],
+      });
+      if (!user) {
+        throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "User not found",
+        });
+      };
+      const recipe = await ctx.prisma.recipe.findUnique({
+        where: { id: input.id },
+        include: { pics: true },
+      });
+      if (!recipe || user.id != recipe.authorId) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Recipe not found",
+        });
+      };
+      const filteredUser = filterUserForClient(user);
+      return {
+        recipe,
+        author: filteredUser,
+      };
   }),
   create: privateProcedure
     .input( 

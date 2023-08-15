@@ -73,15 +73,18 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
   };
 
   return (
-  <div key={recipe.id} className="p-4 gap-3 border-b border-slate-400 flex flex-col">
+  <div key={recipe.id} className="p-4 gap-3 border-b border-neutral-600 flex flex-col">
     <div className="flex relative">
       <div className="flex flex-col">
-        <span className="text-2xl font-semibold">{recipe.name}</span>
+        <Link href={`/${author.username}/${recipe.id}`}>
+          <span className="text-2xl font-semibold">{recipe.name}</span>
+        </Link>
+        
         <div className="flex gap-1 text-slate-400">
           <Link href={`/@${author.username}`}>
             <span>{`@${author.username}`}</span>
           </Link>
-          <Link href={`/post/${recipe.id}`}>
+          <Link href={`/${author.username}/${recipe.id}`}>
             <span className="font-thin">{` · ${dayjs(recipe.createdAt).fromNow()}`}</span>
           </Link>
         </div>
@@ -96,11 +99,13 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
     </div>
 
     <div className='max-w-[1400px] h-[600px] w-full m-auto pb-8 px-4 relative group'>
+      <Link href={`/${author.username}/${recipe.id}`}>
       <div
-        style={{ backgroundImage: `url(${// @ts-ignore
-          slides[currentIndex].url})` }}
+        style={{ backgroundImage: `url(${slides[currentIndex]?.url})` }}
         className='w-full h-full rounded-2xl bg-center bg-cover duration-500'
-      ></div>
+      >
+      </div>
+      </Link>
       {/* Left Arrow */}
       <div className='hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer'>
         <BsChevronCompactLeft onClick={prevSlide} size={30} />
@@ -119,7 +124,7 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
             <RxDotFilled />
           </div>
         ))}
-    </div>
+      </div>
     </div> 
     
 
