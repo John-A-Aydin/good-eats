@@ -63,7 +63,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (typeof slug !== "string") throw new Error("no slug");
 
   // Since the slug is just the end of the url, it still has an @ so we have to remove it
-  const username = slug.replace("@", "");
+  const username = slug; // TODO dont need this
 
   await ssg.profile.getUserByUsername.prefetch({ username });
 

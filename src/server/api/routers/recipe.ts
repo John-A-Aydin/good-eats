@@ -142,9 +142,13 @@ export const recipeRouter = createTRPCRouter({
         });
       };
       const filteredUser = filterUserForClient(user);
+      if (!user.username) return; // Won't actually hit bc user has to have a username to be found in the first place
       return {
         recipe,
-        author: filteredUser,
+        author: {
+          ...filteredUser,
+          username: filteredUser.username,
+        },
       };
   }),
   create: privateProcedure

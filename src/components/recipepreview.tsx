@@ -9,6 +9,7 @@ import { boolean } from "zod";
 import { useState } from "react";
 import { BsChevronCompactLeft, BsChevronCompactRight } from 'react-icons/bs';
 import { RxDotFilled } from 'react-icons/rx';
+import { Carousell } from "./imageCarousell";
 
 /*
   TODO:
@@ -48,30 +49,6 @@ export type RecipeWithPicsAndAuthor = {
 export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
   const { recipe, author } = props;
 
-  const slides = recipe.pics.map((pic) => {
-    return { url: pic.url };
-  });
-  
-  if (!slides) return;
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const prevSlide = () => {
-    const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide ? slides.length -1 : currentIndex - 1;
-    setCurrentIndex(newIndex);
-  };
-
-  const nextSlide = () => {
-    const isLastSlide = currentIndex === slides.length - 1;
-    const newIndex = isLastSlide ? 0 : currentIndex + 1;
-    setCurrentIndex(newIndex);
-  };
-
-  const goToSlide = (slideIndex: number) => {
-    setCurrentIndex(slideIndex);
-  };
-
   return (
   <div key={recipe.id} className="p-4 gap-3 border-b border-neutral-600 flex flex-col">
     <div className="flex relative">
@@ -81,7 +58,7 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
         </Link>
         
         <div className="flex gap-1 text-slate-400">
-          <Link href={`/@${author.username}`}>
+          <Link href={`/${author.username}`}>
             <span>{`@${author.username}`}</span>
           </Link>
           <Link href={`/${author.username}/${recipe.id}`}>
@@ -97,39 +74,7 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
         height={56}
       />
     </div>
-
-    <div className='max-w-[1400px] h-[600px] w-full m-auto pb-8 px-4 relative group'>
-      <Link href={`/${author.username}/${recipe.id}`}>
-      <div
-        style={{ backgroundImage: `url(${slides[currentIndex]?.url})` }}
-        className='w-full h-full rounded-2xl bg-center bg-cover duration-500'
-      >
-      </div>
-      </Link>
-      {/* Left Arrow */}
-      <div className='hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer'>
-        <BsChevronCompactLeft onClick={prevSlide} size={30} />
-      </div>
-      {/* Right Arrow */}
-      <div className='hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer'>
-        <BsChevronCompactRight onClick={nextSlide} size={30} />
-      </div>
-      <div className='flex top-4 justify-center py-2'>
-        {slides.map((slide, slideIndex) => (
-          <div
-            key={slideIndex}
-            onClick={() => goToSlide(slideIndex)}
-            className='text-2xl cursor-pointer'
-          >
-            <RxDotFilled />
-          </div>
-        ))}
-      </div>
-    </div> 
-    
-
-
-
+    <Carousell pics={recipe.pics} link={`/${author.username}/${recipe.id}`}/>
     <p className="">{recipe.description}</p>
   </div>
   );

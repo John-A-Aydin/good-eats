@@ -8,6 +8,9 @@ import { RecipePreview } from "~/components/recipePreview";
 import { useRouter } from "next/router"
 
 import { api } from "~/utils/api"; 
+import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
+import { RxDotFilled } from "react-icons/rx";
+import { Carousell } from "~/components/imageCarousell";
 
 const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
   const router = useRouter();
@@ -16,21 +19,32 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
   const id = params.recipeId;
   if (!username || typeof username !== "string") return <div>Invalid username</div>
   if (!id || typeof id !== "string") return <div>Invalid recipe id</div>
-  const { data } = api.recipe.getByUsernameAndId.useQuery({
+  const { data } = api.recipe.getByUsernameAndId.useQuery({ // Wont let me destruct??
     id,
     username,
   })
   if (!data) return <div>Recipe not found</div>
-  console.log(data);
-  console.log(router.query)
   if (!data.recipe.pics[0]) return <div>404</div>
+
+
   return (
-    <Image
-      src = {data.recipe.pics[0].url}
-      alt = 'something'
-      width = {50}
-      height = {50}
-    />
+    <>
+      <Head>
+        <title>{`${data.recipe.name} · ${data.author.username}`}</title>
+        <meta name="description" content={data.recipe.description} />
+        <link rel="icon" href="/favicon.jpg" />
+      </Head>
+      <PageLayout>
+        <main className="flex flex-col items-center">
+          <h1 className="text-3xl font-semibold my-4">{data.recipe.name}</h1>
+          <Carousell pics={data.recipe.pics}/>
+          <p>{data.recipe.description}</p>
+          <br/>
+          <p>{data.recipe.instructions}</p>
+        </main>
+        
+      </PageLayout>
+    </>
   );
   
 

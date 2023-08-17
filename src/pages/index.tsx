@@ -8,6 +8,7 @@ import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { api } from "~/utils/api";
 import toast from 'react-hot-toast';
 import { RecipePreview } from "~/components/recipePreview";
+import { PageLayout } from "~/components/layout";
 
 const Feed = () => {
   const {data, isLoading: postsLoading } = api.recipe.getAll.useQuery();
@@ -16,7 +17,7 @@ const Feed = () => {
 
   if (!data) return <div>Something went wrong</div>
   return (
-    <div className="flex flex-col w-8/12">
+    <div className="flex flex-col">
       {data.map((fullRecipe) => (
         <RecipePreview {...fullRecipe} key={fullRecipe.recipe.id}/>
         
@@ -52,13 +53,15 @@ const Home: NextPage = () => {
       <Head>
         <title>Good Eats</title>
         <meta name="description" content="Recipe sharing website with a focus on fitness" />
-        <link rel="icon" href="/favicon.jpg" /> 
+        <link rel="icon" href="/favicon.jpg" />
       </Head>
-      <main className="flex flex-col items-center">
-        <SignIn/>
-        {isSignedIn && (<SignedInHeader />)}
-        <Feed />
-      </main>
+      <PageLayout>
+        <main className="flex flex-col items-center">
+          <SignIn/>
+          {isSignedIn && (<SignedInHeader />)}
+          <Feed />
+        </main>
+      </PageLayout>
     </>
   );
 };
