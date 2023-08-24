@@ -1,6 +1,6 @@
 
 export const PieChart = (props: {size?: number, carbs: number, fat: number, protien: number}) => {
-  // Size defaults to 50 if the given size is very small or not given
+  // Size defaults to 100 if the given size is very small or not given
   let size = props.size;
   if (!props.size || props.size < 10) 
     size = 100;
