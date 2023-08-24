@@ -9,6 +9,7 @@ import { api } from "~/utils/api";
 import toast from 'react-hot-toast';
 import { RecipePreview } from "~/components/recipePreview";
 import { PageLayout } from "~/components/layout";
+import { PieChart } from "~/components/piechart";
 
 const Feed = () => {
   const {data, isLoading: postsLoading } = api.recipe.getAll.useQuery();
@@ -26,21 +27,9 @@ const Feed = () => {
   );
 };
 
-const SignedInHeader = () => {
-
-  return ( // TODO create recipe route may change
-    <div className="flex flex-row">
-      <UserButton />
-      <Link href="/create">
-        <Image src="/createButton.png" alt="Create" width={50} height={50}/>
-      </Link>
-    </div>
-  );
-};
-
 const Home: NextPage = () => {
 
-  const { isLoaded: userLoaded, isSignedIn} = useUser();
+  const { isLoaded: userLoaded} = useUser();
 
   // Start fetching asap
   api.recipe.getAll.useQuery();
@@ -58,10 +47,11 @@ const Home: NextPage = () => {
       <PageLayout>
         <main className="flex flex-col items-center">
           <SignIn/>
-          {isSignedIn && (<SignedInHeader />)}
           <Feed />
         </main>
+        
       </PageLayout>
+      
     </>
   );
 };

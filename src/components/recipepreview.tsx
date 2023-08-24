@@ -10,6 +10,7 @@ import { useState } from "react";
 import { BsChevronCompactLeft, BsChevronCompactRight } from 'react-icons/bs';
 import { RxDotFilled } from 'react-icons/rx';
 import { Carousell } from "./imageCarousell";
+import { PieChart } from "./piechart";
 
 /*
   TODO:
@@ -57,7 +58,7 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
           <span className="text-2xl font-semibold">{recipe.name}</span>
         </Link>
         
-        <div className="flex gap-1 text-slate-400">
+        <div className="flex gap-1 text-neutral-400">
           <Link href={`/${author.username}`}>
             <span>{`@${author.username}`}</span>
           </Link>
@@ -75,7 +76,11 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
       />
     </div>
     <Carousell pics={recipe.pics} link={`/${author.username}/${recipe.id}`}/>
-    <p className="">{recipe.description}</p>
+    <div className="flex flex-row">
+      <p className="w-full">{recipe.description}</p>
+      <PieChart carbs={10} protien={16} fat={4.5}/>
+    </div>
+    
   </div>
   );
 };
