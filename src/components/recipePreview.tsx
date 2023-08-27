@@ -1,20 +1,13 @@
 import Link from "next/link";
 
-import type { RouterOutputs } from "~/utils/api";
-
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
-import { boolean } from "zod";
-import { useState } from "react";
-import { BsChevronCompactLeft, BsChevronCompactRight } from 'react-icons/bs';
-import { RxDotFilled } from 'react-icons/rx';
 import { Carousell } from "./imageCarousell";
-import { PieChart } from "./piechart";
+import { PieChart } from "./pieChart";
 
 /*
   TODO:
-   - Make everything clickable to go to full recipe
    - 
 */
 
@@ -76,17 +69,25 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
       />
     </div>
     <Carousell pics={recipe.pics} link={`/${author.username}/${recipe.id}`}/>
-    <div className="flex flex-row">
+    <div className="flex flex-row justify-evenly">
       <p className="w-full">{recipe.description}</p>
-      <PieChart carbs={10} protien={16} fat={4.5}/>
+      <PieChart size={100} carbs={10} protien={16} fat={4.5}/>
+      <div className="flex flex-col w-full">
+        <div className="flex flex-row py-2">
+          <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#FF1700"/></svg>
+          <span className="px-2">{`Protien: 9.4 g`}</span>
+        </div>
+        <div className="flex flex-row py-2">
+          <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#4D6910"/></svg>
+          <span className="px-2">{`Carbs: 9.6 g`}</span>
+        </div>
+        <div className="flex flex-row py-2">
+          <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#FFA600"/></svg>
+          <span className="px-2">{`Fats: 4.5 g`}</span>
+        </div>
+      </div>
     </div>
     
   </div>
   );
 };
-
-/*
-  Credit to Clint Briley for the carousell:
-    https://github.com/fireclint/react-tailwind-slider/blob/main/src/App.js
-    https://www.youtube.com/@codecommerce
-*/

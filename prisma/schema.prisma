@@ -24,16 +24,13 @@ model Recipe {
     pics         RecipePics[] 
 
     // TODO - Make nutrition info either seperate model with relation or an object
-    //carbs        Float?
-    //protien      Float?
-    //fat          Float?
     
-
+    nutrition Nutrition? // TODO make required?
     // TODO tags?
     
 
     @@index([authorId])
-    // TODO figure out what this is
+    // TODO figure out what this actually does 
 }
 
 model RecipePics {  // CAREFULL: untested
@@ -42,6 +39,11 @@ model RecipePics {  // CAREFULL: untested
     recipeId      String   
 
     @@index([recipeId])
+}
+
+model Nutrition {
+    recipeId    String  @id @unique
+    recipe Recipe @relation(fields: [recipeId], references: [id])
 }
 
 

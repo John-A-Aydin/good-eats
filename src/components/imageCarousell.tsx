@@ -74,3 +74,9 @@ export const Carousell = (props: {pics: picArray, link?: string}) => {
     </div>
   );
 };
+
+/*
+  Credit to Clint Briley for the carousell:
+    https://github.com/fireclint/react-tailwind-slider/blob/main/src/App.js
+    https://www.youtube.com/@codecommerce
+*/

@@ -9,7 +9,8 @@ import { api } from "~/utils/api";
 import toast from 'react-hot-toast';
 import { RecipePreview } from "~/components/recipePreview";
 import { PageLayout } from "~/components/layout";
-import { PieChart } from "~/components/piechart";
+import { PieChart } from "~/components/pieChart";
+
 
 const Feed = () => {
   const {data, isLoading: postsLoading } = api.recipe.getAll.useQuery();
@@ -49,7 +50,7 @@ const Home: NextPage = () => {
           <SignIn/>
           <Feed />
         </main>
-        
+        <PieChart size={50} carbs={10} protien={15} fat={6}/>
       </PageLayout>
       
     </>

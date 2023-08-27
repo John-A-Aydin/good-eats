@@ -4,7 +4,7 @@ import Image from "next/image"
 import { generateSSGHelper } from "~/server/helpers/ssgHelper";
 import { PageLayout } from "~/components/layout";
 import { LoadingPage } from "~/components/loading";
-import { RecipePreview } from "~/components/recipePreview";
+
 import { useRouter } from "next/router"
 
 import { api } from "~/utils/api"; 
