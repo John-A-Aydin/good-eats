@@ -1,6 +1,7 @@
 /*
   TODO
     - Make size optional and default to 100
+    - More accesible colors
 */
 export const PieChart = (props: {size: number, carbs: number, fat: number, protien: number}) => {
   let size = props.size;

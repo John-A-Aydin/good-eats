@@ -1,12 +1,8 @@
 import { SignIn, useUser, UserButton } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
 import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { api } from "~/utils/api";
-import toast from 'react-hot-toast';
 import { RecipePreview } from "~/components/recipePreview";
 import { PageLayout } from "~/components/layout";
 import { PieChart } from "~/components/pieChart";

@@ -43,6 +43,9 @@ model RecipePics {  // CAREFULL: untested
 
 model Nutrition {
     recipeId    String  @id @unique
+    carbs       Float
+    protien     Float
+    fat         Float
     recipe Recipe @relation(fields: [recipeId], references: [id])
 }
 

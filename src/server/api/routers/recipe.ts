@@ -15,6 +15,12 @@ type RecipesWithPics = (
       url: string;
       recipeId: string;
     }[];
+    nutrition: { 
+      recipeId: string;
+      carbs: number;
+      protien: number;
+      fat: number;
+    } | null;
   } & {
     id: string;
     authorId: string;
@@ -29,6 +35,8 @@ type RecipesWithPics = (
 /*
   TODO's
    - Ratelimit
+   - Add nutrition parame in create
+   - 
 */
 
 const UPLOAD_MAX_FILE_SIZE = 1_000_000;
@@ -86,6 +94,7 @@ export const recipeRouter = createTRPCRouter({
         orderBy: [{ createdAt: "desc"}],
         include: {
           pics: true,
+          nutrition: true,
         },
       });
 
@@ -98,6 +107,7 @@ export const recipeRouter = createTRPCRouter({
         where: { id: input.id },
         include: {
           pics: true,
+          nutrition: true,
         },
       });
 
@@ -112,7 +122,7 @@ export const recipeRouter = createTRPCRouter({
         where: { authorId: input.userId },
         take: 100,
         orderBy: [{ createdAt: "desc" }],
-        include: { pics: true },
+        include: { pics: true, nutrition: true, },
       });
       return (await addUserDataToRecipes(recipes));
   }),
@@ -133,7 +143,7 @@ export const recipeRouter = createTRPCRouter({
       };
       const recipe = await ctx.prisma.recipe.findUnique({
         where: { id: input.id },
-        include: { pics: true },
+        include: { pics: true, nutrition: true, },
       });
       if (!recipe || user.id != recipe.authorId) {
         throw new TRPCError({
