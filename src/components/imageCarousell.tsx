@@ -31,7 +31,7 @@ export const Carousell = (props: {pics: picArray, link?: string}) => {
   const goToSlide = (slideIndex: number) => {
     setCurrentIndex(slideIndex);
   };
-  const url = slides[currentIndex];
+  const url = slides[currentIndex]?.url;
   if (!url)
     return <div>oops something went wrong</div>
   return (
