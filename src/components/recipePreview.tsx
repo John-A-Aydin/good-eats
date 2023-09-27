@@ -49,7 +49,7 @@ export type RecipeWithPicsAndAuthor = {
 export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
   const { recipe, author } = props;
 
-  const nutrition = recipe.nutrition ? {carbs: 0, };
+  const nutrition = recipe.nutrition ? {carbs: 0, }; // TODO Figrue out wtf this is 
   return (
   <div key={recipe.id} className="p-4 gap-3 border-b border-neutral-600 flex flex-col">
     <div className="flex relative">

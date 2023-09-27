@@ -14,6 +14,17 @@ import axios from "axios";
     - crop images to 1200x1200?
 
 */
+type postInfoType = {
+  name: string;
+  description: string;
+  instructions: string;
+  imageTypes: string[];
+  nutrition: {
+    carbs: number;
+    fat: number;
+    protien: number;
+  };
+};
 
 const CreateRecipeWizard = () => { // TODO clear input fields on submit
   
@@ -21,11 +32,16 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
 
   const { user } = useUser();
   const ctx = api.useContext();
-  const [postInfo , setPostInfo] = useState<{name: string, description: string, instructions: string, imageTypes: string[]}>({
+  const [postInfo , setPostInfo] = useState<postInfoType>({
     name: "",
     description: "",
     instructions: "",
     imageTypes: [],
+    nutrition: {
+      carbs: 0,
+      protien: 0,
+      fat: 0,
+    },
   });
   const [selectedImageURLs, setSelectedImageURLs] = useState<string[]>([]);
   const [selectedImageFiles, setSelectedImageFiles] = useState<File[]>([]);
@@ -51,6 +67,11 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
         description: "",
         instructions: "",
         imageTypes: [],
+        nutrition: {
+          carbs: 0,
+          protien: 0,
+          fat: 0,
+        },
       });
       void ctx.recipe.getAll.invalidate();
       window.location.href = `/@${user?.username}`
@@ -250,6 +271,9 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
               })}
           </div>
         </section>
+        <div>
+
+        </div>
       </div>
     </>
   );
