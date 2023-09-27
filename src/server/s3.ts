@@ -25,4 +25,4 @@ export async function generateUploadUrl() {
 
   const uploadURL = await s3.getSignedUrlPromise('putObject', params);
   return { uploadURL, imageId };
-};
+}

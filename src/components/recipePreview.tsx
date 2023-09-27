@@ -45,7 +45,7 @@ export type RecipeWithPicsAndAuthor = {
     profileImageUrl: string;
   }
 }
-
+// TODO add the nutrition numbers back
 export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
   const { recipe, author } = props;
 
@@ -82,15 +82,15 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
       <div className="flex flex-col w-full">
         <div className="flex flex-row py-2">
           <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#FF1700"/></svg>
-          <span className="px-2">{`Protien: ${recipe.nutrition?.protien} g`}</span>
+          <span className="px-2">{`Protien:  g`}</span> 
         </div>
         <div className="flex flex-row py-2">
           <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#4D6910"/></svg>
-          <span className="px-2">{`Carbs: ${recipe.nutrition?.carbs} g`}</span>
+          <span className="px-2">{`Carbs:  g`}</span>
         </div>
         <div className="flex flex-row py-2">
           <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#FFA600"/></svg>
-          <span className="px-2">{`Fats: ${recipe.nutrition?.fat} g`}</span>
+          <span className="px-2">{`Fats:  g`}</span>
         </div>
       </div>
     </div>

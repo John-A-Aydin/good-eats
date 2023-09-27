@@ -13,11 +13,9 @@ export const Carousell = (props: {pics: picArray, link?: string}) => {
   const slides = props.pics.map((pic) => {
     return { url: pic.url };
   });
-  
-  if (!slides) return;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-
+  if (!slides) return;
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
     const newIndex = isFirstSlide ? slides.length -1 : currentIndex - 1;
@@ -39,14 +37,16 @@ export const Carousell = (props: {pics: picArray, link?: string}) => {
       { props.link ? (
         <Link href={props.link}>
           <div
-            style={{ backgroundImage: `url(${slides[currentIndex]?.url})` }}
+            style={{ backgroundImage: `url(${// @ts-ignore
+                                            slides[currentIndex].url})` }}
             className='w-full h-full rounded-2xl bg-center bg-cover duration-500'
           >
           </div>
         </Link>
       ) : (
         <div
-          style={{ backgroundImage: `url(${slides[currentIndex]?.url})` }}
+          style={{ backgroundImage: `url(${// @ts-ignore
+                                          slides[currentIndex]?.url})` }}
           className='w-full h-full rounded-2xl bg-center bg-cover duration-500'
         >
         </div>

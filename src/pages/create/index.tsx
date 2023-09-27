@@ -74,7 +74,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
         },
       });
       void ctx.recipe.getAll.invalidate();
-      window.location.href = `/@${user?.username}`
+      window.location.href = `/${user?.username}`
       return variables.post;
     },
     // If something goes wrong with post or zod denies content, post message

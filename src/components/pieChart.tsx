@@ -4,7 +4,7 @@
     - More accesible colors
 */
 export const PieChart = (props: {size: number, carbs: number, fat: number, protien: number}) => {
-  let size = props.size;
+  const size = props.size;
   // if (!size || size < 10) 
   //   size = 100;
 
