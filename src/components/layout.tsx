@@ -19,7 +19,7 @@ const SignedInHeader = () => {
 export const PageLayout= (props: PropsWithChildren) => {
   const { isLoaded: userLoaded, isSignedIn} = useUser();
   return (
-    <main className="flex flex-row h-screen justify-center">
+    <main className="flex flex-row justify-center">
       {/* {overflow-y-scroll} */}
       <div className="h-screen w-2/12 absolute top-0 left-0">
         testing contents
