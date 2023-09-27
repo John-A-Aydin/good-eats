@@ -1,6 +1,6 @@
 import { SignIn, useUser } from "@clerk/nextjs";
 import Head from "next/head";
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { api } from "~/utils/api";
 import toast from 'react-hot-toast';
 import axios from "axios";
@@ -74,7 +74,9 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
         },
       });
       void ctx.recipe.getAll.invalidate();
-      window.location.href = `/${user?.username}`
+  
+      if (user && user.username)
+        window.location.href = `/${user.username}`
       return variables.post;
     },
     // If something goes wrong with post or zod denies content, post message
@@ -89,7 +91,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     },
   });
   
-  const handleChange = (e: any) => {
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     /*
      TODO's
       - Fix e type
@@ -100,7 +102,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
       return {...prev, [name]: value}
     });
   };
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     /*
       TODO's
         - Fix e type
@@ -118,10 +120,10 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
 
     if (!user ) return;
 
-    const blobArray = selectedImageURLs.map(async (objectURL) => {
-      const blobURL =  new URL(objectURL);
-      return await fetch(blobURL).then(r => r.blob());
-    });
+    // const blobArray = selectedImageURLs.map(async (objectURL) => {
+    //   const blobURL =  new URL(objectURL);
+    //   return await fetch(blobURL).then(r => r.blob());
+    // });
 
     // Checking for absent information before calling mutation
     if (postInfo.name !== "" && postInfo.description !== "" && postInfo.instructions !== "") {
@@ -185,10 +187,9 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
       </Head>
       
       <div className="bg-neutral-900">
-        <div className="flex flex-col rounded-md w-8/12">
+        <form onSubmit={handleSubmit} className="flex flex-col rounded-md w-8/12">
           <h3>Name :</h3>
-          <input
-            type="text"
+          <textarea
             name="name"
             onChange={handleChange}
             className="bg-neutral-800 rounded-md m-4 border-[1px] border-gray-400"
@@ -208,8 +209,8 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
             className="bg-neutral-800 h-96 rounded-md m-4 border-[1px] border-gray-400"
             placeholder=" Write detailed instructions with clear steps"
           />
-          <button onClick={handleSubmit} className="bg-neutral-800 w-16 rounded-full">Post</button>
-        </div>
+          <button type={"submit"} className="bg-neutral-800 w-16 rounded-full">Post</button>
+        </form>
 
         <section>
           <label className="p-2 bg-neutral-800 rounded-full text-">

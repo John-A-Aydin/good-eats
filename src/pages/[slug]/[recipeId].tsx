@@ -30,7 +30,7 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
   return (
     <>
       <Head>
-        <title>{`${data.recipe.name} · ${data.author.username}`}</title>
+        <title>{`${data.recipe.name}`}</title>
         <meta name="description" content={data.recipe.description} />
         <link rel="icon" href="/favicon.jpg" />
       </Head>

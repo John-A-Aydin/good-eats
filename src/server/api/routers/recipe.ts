@@ -140,7 +140,7 @@ export const recipeRouter = createTRPCRouter({
             code: "INTERNAL_SERVER_ERROR",
             message: "User not found",
         });
-      };
+      }
       const recipe = await ctx.prisma.recipe.findUnique({
         where: { id: input.id },
         include: { pics: true, nutrition: true, },
@@ -150,7 +150,7 @@ export const recipeRouter = createTRPCRouter({
           code: "NOT_FOUND",
           message: "Recipe not found",
         });
-      };
+      }
       const filteredUser = filterUserForClient(user);
       if (!user.username) return; // Won't actually hit bc user has to have a username to be found in the first place
       return {
@@ -211,7 +211,7 @@ export const recipeRouter = createTRPCRouter({
         Key: id,
         Expires: 1800, // 30 minutes (may need to change)
       }) // May need to add beck content type
-      const presignedURL = await s3.getSignedUrl('putObject', params);
+      const presignedURL = s3.getSignedUrl('putObject', params);
       
       if(!presignedURL) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
       // Creates image data in database
