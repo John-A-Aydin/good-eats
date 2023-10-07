@@ -7,10 +7,8 @@ import axios from "axios";
 
 /*
   TODO's
-    - FIGURE OUT HOW TO ACCESS MUTATION RETURN VALUES
     - Fix all TODO's
     - Post button should not show unless all requirements are fulfilled
-    - Fix deleteHandler
     - crop images to 1200x1200?
 */
 type T_postInfo = {
@@ -115,14 +113,9 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     /*
       TODO's
         - More rigorous checking for undefined urls, imageIds, and image types
-        - Give detailed responses for every case where a post does not go through
     */
     e.preventDefault();
     
-    // Populating presignedURLArray with AWS upload urls and adding imageId's to state
-    
-    
-
     if (!user ) return;
 
     // Checking for absent information before calling mutation
@@ -308,7 +301,6 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
                     >
                       delete
                     </button>
-                    <p>{index + 1}</p>
                   </div>
                 );
               })}
