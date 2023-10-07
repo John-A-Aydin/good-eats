@@ -169,6 +169,11 @@ export const recipeRouter = createTRPCRouter({
         description: z.string().min(1).max(255),
         instructions: z.string(),
         imageTypes: z.string().array(),
+        nutrition: z.object({
+          carbs: z.number(),
+          protien: z.number(),
+          fat: z.number(),
+        }),
         // TODO change up the nutrion formating
       })
     )
@@ -200,7 +205,7 @@ export const recipeRouter = createTRPCRouter({
       Creates presigned urls for image uploads and adds image data to database
 
       POSSIBLE ISSUE: If the client fails to upload pictures after mutation is called,
-      there will be images in the database with no image associated with thier url.
+      there will be imageIds in the database with no image associated with their url.
      */
     
     const unawaitedPresignedURLArray = input.imageTypes.map(async (type) => {
@@ -215,7 +220,6 @@ export const recipeRouter = createTRPCRouter({
       
       if(!presignedURL) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
       // Creates image data in database
-      console.log(presignedURL + "                                               1");
       await ctx.prisma.recipePics.create({
         data: {
           url: `${env.AWS_RECIPE_BUCKET_URL}${id}`,
@@ -228,7 +232,22 @@ export const recipeRouter = createTRPCRouter({
       });
       return presignedURL;
     });
-    const presignedURLArray = await Promise.all(unawaitedPresignedURLArray)
+
+    const presignedURLArray = await Promise.all(unawaitedPresignedURLArray);
+
+    await ctx.prisma.nutrition.create({
+      data: {
+        carbs: input.nutrition.carbs,
+        protien: input.nutrition.protien,
+        fat: input.nutrition.fat,
+        recipe: {
+          connect: {
+            id: post.id
+          }
+        }
+      }
+    });
+    
     return {post, presignedURLArray};
   }),
 });

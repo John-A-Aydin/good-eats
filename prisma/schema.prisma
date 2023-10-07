@@ -36,17 +36,19 @@ model Recipe {
 model RecipePics {  // CAREFULL: untested
     url           String   @id
     recipe        Recipe   @relation(fields: [recipeId], references: [id])
-    recipeId      String   
+    recipeId      String   @unique
 
     @@index([recipeId])
 }
 
 model Nutrition {
-    recipeId    String  @id @unique
     carbs       Float
     protien     Float
     fat         Float
+    recipeId    String  @id @unique
     recipe Recipe @relation(fields: [recipeId], references: [id])
+
+    @@index([recipeId])
 }
 
 

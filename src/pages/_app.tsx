@@ -6,7 +6,7 @@ import { Toaster } from "react-hot-toast";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
-    <div className="text-slate-100 bg-neutral-900 h-full">
+    <div className="text-slate-100 bg-neutral-900 min-h-screen h-full">
       <ClerkProvider {...pageProps}>
         <Toaster 
           position="bottom-center"

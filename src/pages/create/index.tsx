@@ -12,9 +12,8 @@ import axios from "axios";
     - Post button should not show unless all requirements are fulfilled
     - Fix deleteHandler
     - crop images to 1200x1200?
-
 */
-type postInfoType = {
+type T_postInfo = {
   name: string;
   description: string;
   instructions: string;
@@ -32,7 +31,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
 
   const { user } = useUser();
   const ctx = api.useContext();
-  const [postInfo , setPostInfo] = useState<postInfoType>({
+  const [postInfo , setPostInfo] = useState<T_postInfo>({
     name: "",
     description: "",
     instructions: "",
@@ -57,9 +56,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
         console.log(presignedURL);
         if (!presignedURL || !imageFile) return;
         console.log(imageFile);
-        // await new Promise(r => setTimeout(r, 20000));
         const temp = await axios.put(presignedURL, imageFile);
-        // await new Promise(r => setTimeout(r, 2000));
         console.log(temp);
       }
       setPostInfo({
@@ -74,7 +71,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
         },
       });
       void ctx.recipe.getAll.invalidate();
-  
+
       if (user && user.username)
         window.location.href = `/${user.username}`
       return variables.post;
@@ -92,26 +89,34 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
   });
   
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    /*
-     TODO's
-      - Fix e type
-    */
     const name = e.target.name;
     const value = e.target.value;
     setPostInfo((prev) => {
       return {...prev, [name]: value}
     });
   };
+
+  const handleNutritionChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.name;
+    const value = e.target.valueAsNumber;
+    
+    setPostInfo((prev) => {
+      return {
+        ...prev,
+         nutrition: {
+          ...prev.nutrition,
+          [name]: value,
+        }
+      }
+    });
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     /*
       TODO's
-        - Fix e type
-        - Check if uploads are working
         - More rigorous checking for undefined urls, imageIds, and image types
-        - In early return cases add error messages
-        - rename data array
-        - Figure out promise on imageId array
-      */
+        - Give detailed responses for every case where a post does not go through
+    */
     e.preventDefault();
     
     // Populating presignedURLArray with AWS upload urls and adding imageId's to state
@@ -120,18 +125,19 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
 
     if (!user ) return;
 
-    // const blobArray = selectedImageURLs.map(async (objectURL) => {
-    //   const blobURL =  new URL(objectURL);
-    //   return await fetch(blobURL).then(r => r.blob());
-    // });
-
     // Checking for absent information before calling mutation
-    if (postInfo.name !== "" && postInfo.description !== "" && postInfo.instructions !== "") {
+    if (postInfo.name == "") {
+      toast.error("Please give your recipe a name.");
+    } else if (postInfo.description == "") {
+      toast.error("Please give your recipe a description.");
+    } else if (postInfo.instructions == "") {
+      toast.error("Please write some instructions.");
+    } else if (!selectedImageFiles[0]) {
+      toast.error("Please upload some pictures of your dish.");
+    } else {
       mutate(postInfo);
     }
     
-    
-
   }
 
   
@@ -158,7 +164,6 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     setPostInfo((prev) => {
       return {...prev, imageTypes: prev.imageTypes.concat(imageTypes)};
     });
-    console.log(imageTypes); // TODO remove @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     // FOR BUG IN CHROME
     e.target.value = "";
   }
@@ -186,34 +191,71 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
           <link rel="icon" href="/favicon.jpg" /> 
       </Head>
       
-      <div className="bg-neutral-900">
-        <form onSubmit={handleSubmit} className="flex flex-col rounded-md w-8/12">
-          <h3>Name :</h3>
-          <textarea
-            name="name"
-            onChange={handleChange}
-            className="bg-neutral-800 rounded-md m-4 border-[1px] border-gray-400"
-            placeholder=" Give your recipe a unique name"
-          />
-          <h3>Description :</h3>
-          <textarea
-            name="description"
-            onChange={handleChange}
-            className="bg-neutral-800 h-24 rounded-md m-4 border-[1px] border-gray-400"
-            placeholder=" Write about your inspiration for the dish or about its flavor"
-          /> 
-          <h3>Instructions :</h3>
-          <textarea
-            name="instructions"
-            onChange={handleChange}
-            className="bg-neutral-800 h-96 rounded-md m-4 border-[1px] border-gray-400"
-            placeholder=" Write detailed instructions with clear steps"
-          />
-          <button type={"submit"} className="bg-neutral-800 w-16 rounded-full">Post</button>
-        </form>
-
+      <div className="bg-neutral-900 h-screen mx-24 pt-4">
+        
+          <form onSubmit={handleSubmit} className="flex flex-row rounded-md w-full mb-4">
+            <div className="flex flex-col w-full">
+              <h3>Name :</h3>
+              <textarea
+                name="name"
+                onChange={handleChange}
+                className="bg-neutral-800 rounded-md m-4 py-2 px-4 border-[1px] border-gray-400"
+                placeholder="Give your recipe a unique name"
+              />
+              <h3>Description :</h3>
+              <textarea
+                name="description"
+                onChange={handleChange}
+                className="bg-neutral-800 h-24 rounded-md m-4 py-2 px-4 border-[1px] border-gray-400"
+                placeholder="Write about your inspiration for the dish or about its flavor"
+              /> 
+              <h3>Instructions :</h3>
+              <textarea
+                name="instructions"
+                onChange={handleChange}
+                className="bg-neutral-800 h-96 rounded-md m-4 py-2 px-4 border-[1px] border-gray-400"
+                placeholder="Write detailed instructions with clear steps"
+              />
+              <button type={"submit"} className="bg-neutral-800 w-16 rounded-full">Post</button>
+            </div>
+            <div className="flex flex-col m-4">
+              <div>
+                Protein (g) :
+                <input
+                  name="protien"
+                  onChange={handleNutritionChange}
+                  className="bg-neutral-800 w-40 rounded-md m-4 py-1 px-4 border-[1px] border-gray-400" 
+                  type="number"
+                  placeholder="0.0"
+                />
+              </div>
+              <div>
+                Carbs (g) :
+                <input
+                  name="carbs"
+                  onChange={handleNutritionChange}
+                  className="bg-neutral-800 w-40 rounded-md m-4 py-1 px-4 border-[1px] border-gray-400" 
+                  type="number"
+                  placeholder="0.0"
+                />
+              </div>
+              <div>
+                Fat (g) :
+                <input
+                  name="fat"
+                  onChange={handleNutritionChange}
+                  className="bg-neutral-800 w-40 rounded-md m-4 py-1 px-4 border-[1px] border-gray-400" 
+                  type="number"
+                  placeholder="0.0"
+                />
+              </div>
+            </div>
+          </form>
+          
+        
+        
         <section>
-          <label className="p-2 bg-neutral-800 rounded-full text-">
+          <label className="p-2 bg-neutral-800 rounded-full">
             + Add Pics
             <input
               className="hidden"
