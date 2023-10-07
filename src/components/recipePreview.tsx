@@ -46,8 +46,12 @@ export type RecipeWithPicsAndAuthor = {
   }
 }
 // TODO add the nutrition numbers back
+
 export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
   const { recipe, author } = props;
+  const protien = recipe.nutrition ? (recipe.nutrition.protien) : 0;
+  const carbs = recipe.nutrition ? (recipe.nutrition.carbs) : 0;
+  const fats = recipe.nutrition ? (recipe.nutrition.fat) : 0;
 
   // const nutrition = recipe.nutrition; // TODO Figrue out wtf this is 
   return (
@@ -78,21 +82,28 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
     <Carousell pics={recipe.pics} link={`/${author.username}/${recipe.id}`}/>
     <div className="flex flex-row justify-evenly">
       <p className="w-full">{recipe.description}</p>
-      <PieChart size={100} carbs={10} protien={16} fat={4.5}/>
-      <div className="flex flex-col w-full">
-        <div className="flex flex-row py-2">
-          <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#FF1700"/></svg>
-          <span className="px-2">{`Protien:  g`}</span> 
+      { recipe.nutrition ? (
+        <>
+        <PieChart size={100} carbs={recipe.nutrition.carbs} protien={recipe.nutrition.protien} fat={recipe.nutrition.fat}/>
+        <div className="flex flex-col w-full">
+          <div className="flex flex-row py-2">
+            <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#FF1700"/></svg>
+            <span className="px-2">{`Protien: ${recipe.nutrition.protien} g`}</span> 
+          </div>
+          <div className="flex flex-row py-2">
+            <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#4D6910"/></svg>
+            <span className="px-2">{`Carbs: ${recipe.nutrition.carbs} g`}</span>
+          </div>
+          <div className="flex flex-row py-2">
+            <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#FFA600"/></svg>
+            <span className="px-2">{`Fat: ${recipe.nutrition.fat} g`}</span>
+          </div>
         </div>
-        <div className="flex flex-row py-2">
-          <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#4D6910"/></svg>
-          <span className="px-2">{`Carbs:  g`}</span>
-        </div>
-        <div className="flex flex-row py-2">
-          <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#FFA600"/></svg>
-          <span className="px-2">{`Fats:  g`}</span>
-        </div>
-      </div>
+        </>
+      ) : (
+        <div>No nutrition info</div>
+      )}
+      
     </div>
     
   </div>
