@@ -49,9 +49,6 @@ export type RecipeWithPicsAndAuthor = {
 
 export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
   const { recipe, author } = props;
-  const protien = recipe.nutrition ? (recipe.nutrition.protien) : 0;
-  const carbs = recipe.nutrition ? (recipe.nutrition.carbs) : 0;
-  const fats = recipe.nutrition ? (recipe.nutrition.fat) : 0;
 
   // const nutrition = recipe.nutrition; // TODO Figrue out wtf this is 
   return (
@@ -85,7 +82,7 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
       { recipe.nutrition ? (
         <>
         <PieChart size={100} carbs={recipe.nutrition.carbs} protien={recipe.nutrition.protien} fat={recipe.nutrition.fat}/>
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col mt-2 w-full">
           <div className="flex flex-row py-2">
             <svg height={15} width={15} viewBox={`0 0 ${15} ${15}`}><circle r={7.5} cx={7.5} cy={7.5} fill="#FF1700"/></svg>
             <span className="px-2">{`Protien: ${recipe.nutrition.protien} g`}</span> 
