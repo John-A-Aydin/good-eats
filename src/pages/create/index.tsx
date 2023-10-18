@@ -21,6 +21,7 @@ type T_postInfo = {
     fat: number;
     protien: number;
   };
+  tags: string[];
 };
 
 const CreateRecipeWizard = () => { // TODO clear input fields on submit
@@ -39,6 +40,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
       protien: 0,
       fat: 0,
     },
+    tags: [],
   });
   const [selectedImageURLs, setSelectedImageURLs] = useState<string[]>([]);
   const [selectedImageFiles, setSelectedImageFiles] = useState<File[]>([]);
@@ -67,6 +69,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
           protien: 0,
           fat: 0,
         },
+        tags: [],
       });
       void ctx.recipe.getAll.invalidate();
 
@@ -184,9 +187,9 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
           <link rel="icon" href="/favicon.jpg" /> 
       </Head>
       
-      <div className="bg-neutral-900 h-screen mx-24 pt-4">
+      <div className="flex flex-col bg-neutral-900 h-screen px-24 w-screen pt-4">
         
-          <form onSubmit={handleSubmit} className="flex flex-row rounded-md w-full mb-4">
+          <form onSubmit={handleSubmit} className="flex flex-row rounded-md w-full max-w-6xl mb-4 justify-self-center">
             <div className="flex flex-col w-full">
               <h3>Name :</h3>
               <textarea
@@ -241,6 +244,12 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
                   type="number"
                   placeholder="0.0"
                 />
+              </div>
+            </div>
+            <div>
+              Tags:
+              <div className="bg-neutral-800 w-40 rounded-md m-4 py-1 px-4 border-[1px] border-gray-400">
+                
               </div>
             </div>
           </form>

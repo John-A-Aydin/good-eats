@@ -174,6 +174,7 @@ export const recipeRouter = createTRPCRouter({
           protien: z.number(),
           fat: z.number(),
         }),
+        tags: z.string().array(),
         // TODO change up the nutrion formating
       })
     )

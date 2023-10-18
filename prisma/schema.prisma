@@ -51,10 +51,9 @@ model Nutrition {
 model Tag {
     name     String  @id @unique
     recipes     PostTag[]   
-
 }
 
-model PostTag {
+model PostTag { // Intermediary table for the m2m recipe and tag relation
 
     tagName     String
     tag         Tag     @relation(fields: [tagName], references: [name])
