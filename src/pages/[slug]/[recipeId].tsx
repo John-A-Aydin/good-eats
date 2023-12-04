@@ -8,8 +8,6 @@ import { LoadingPage } from "~/components/loading";
 import { useRouter } from "next/router"
 
 import { api } from "~/utils/api"; 
-import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
-import { RxDotFilled } from "react-icons/rx";
 import { Carousell } from "~/components/imageCarousell";
 
 const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
