@@ -221,7 +221,7 @@ export const recipeRouter = createTRPCRouter({
       
       if(!presignedURL) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
       // Creates image data in database
-      await ctx.prisma.recipePics.create({
+      await ctx.prisma.recipePic.create({
         data: {
           url: `${env.AWS_RECIPE_BUCKET_URL}${id}`,
           recipe: {

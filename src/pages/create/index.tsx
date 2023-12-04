@@ -246,12 +246,12 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
                 />
               </div>
             </div>
-            <div>
+            {/* <div>
               Tags:
               <div className="bg-neutral-800 w-40 rounded-md m-4 py-1 px-4 border-[1px] border-gray-400">
                 
               </div>
-            </div>
+            </div> */}
           </form>
           
         
