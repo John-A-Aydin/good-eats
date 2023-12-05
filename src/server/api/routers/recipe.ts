@@ -251,4 +251,48 @@ export const recipeRouter = createTRPCRouter({
     
     return {post, presignedURLArray};
   }),
+  delete: privateProcedure
+    .input(z.object({ recipeId: z.string() }))
+    .mutation(async ({ctx, input}) => {
+      const recipe_to_delete = await ctx.prisma.recipe.findUnique({
+        where: { id: input.recipeId },
+        include: { pics: true, nutrition: true, },
+    });
+    // Checking to make sure the recipe actually exists
+    // Might need to change trpc error to just a return idrk
+    if (!recipe_to_delete) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Author for recipe not found",
+      });
+    }
+    // Checking for ownership of post
+    if (ctx.userId != recipe_to_delete.authorId) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "This is not your post",
+      })
+    }
+    await ctx.prisma.nutrition.delete({
+      where: {recipeId: recipe_to_delete.id}
+    })
+    // Stupidly ineffecient
+    const keys : string[] = recipe_to_delete.pics.map((recipePic) => {
+      const url = recipePic.url;
+      let id : string = "";
+      for (let i = url.length - 1; i >= 0; i--) {
+        if (url.charAt(i) != '/') {
+          let temp : string = url.charAt(i);
+          id = temp += id;
+        } else {
+          return id;
+        }
+      }
+      return id;
+    })
+    // TODO get AWS ids from pic urls
+    recipe_to_delete.pics.map(async (picId) => {
+      s3.deleteObject()
+    })
+  }),
 });
