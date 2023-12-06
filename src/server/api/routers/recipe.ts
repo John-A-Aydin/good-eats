@@ -8,6 +8,7 @@ import { filterUserForClient } from "~/server/helpers/filterUserForClient";
 import { env } from "~/env.mjs";
 import S3 from "aws-sdk/clients/s3";
 import { createId } from "@paralleldrive/cuid2";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 type RecipesWithPics = (
   {
@@ -40,6 +41,7 @@ type RecipesWithPics = (
 */
 
 const UPLOAD_MAX_FILE_SIZE = 1_000_000;
+const bucket_name = env.AWS_RECIPE_BUCKET_NAME;
 
 // TODO web dev cody vid figure out wtf is going on
 const s3 = new S3({
@@ -48,6 +50,14 @@ const s3 = new S3({
   secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
   region: "us-east-1",
   signatureVersion: 'v4',
+});
+
+const s3Client = new S3Client({
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+  }
 });
 
 const addUserDataToRecipes = async (recipes: RecipesWithPics[]) => {
@@ -291,8 +301,20 @@ export const recipeRouter = createTRPCRouter({
       return id;
     })
     // TODO get AWS ids from pic urls
+    const bucketParams = {Bucket: env.AWS_RECIPE_BUCKET_NAME}
     keys.map(async (key) => {
-      s3.deleteObject()
+      await s3Client.send(new DeleteObjectCommand({
+        Bucket: env.AWS_RECIPE_BUCKET_NAME,
+        Key: key,
+      }))
+    })
+    // Deleting pic info from db
+    await ctx.prisma.recipePic.deleteMany({
+      where: {recipeId: recipe_to_delete.id}
+    })
+    // Deleting rest of post
+    await ctx.prisma.recipe.delete({
+      where: {id: recipe_to_delete.id}
     })
   }),
 });

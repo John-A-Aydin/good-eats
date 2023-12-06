@@ -5,6 +5,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { Carousell } from "./imageCarousell";
 import { PieChart } from "./pieChart";
+import { useUser } from "@clerk/nextjs";
 
 /*
   TODO:
@@ -49,7 +50,9 @@ export type RecipeWithPicsAndAuthor = {
 
 export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
   const { recipe, author } = props;
-
+  const viewerId = useUser().user?.id;
+  // TODO use isOwner to load an options / delete button
+  const isOwner = recipe.authorId == viewerId;
   // const nutrition = recipe.nutrition; // TODO Figrue out wtf this is 
   return (
   <div key={recipe.id} className="p-4 gap-3 border-b border-neutral-600 flex flex-col">
