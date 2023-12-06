@@ -291,7 +291,7 @@ export const recipeRouter = createTRPCRouter({
       return id;
     })
     // TODO get AWS ids from pic urls
-    recipe_to_delete.pics.map(async (picId) => {
+    keys.map(async (key) => {
       s3.deleteObject()
     })
   }),
