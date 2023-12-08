@@ -1,20 +1,44 @@
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image"
 import { generateSSGHelper } from "~/server/helpers/ssgHelper";
 import { PageLayout } from "~/components/layout";
-import { LoadingPage } from "~/components/loading";
+import toast from 'react-hot-toast';
 
 import { useRouter } from "next/router"
 
 import { api } from "~/utils/api"; 
 import { Carousell } from "~/components/imageCarousell";
+import { useUser } from "@clerk/nextjs";
+
+
 
 const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
   const router = useRouter();
   const params = router.query;
   const username = params.slug;
   const id = params.recipeId;
+  const ctx = api.useContext();
+  const viewer = useUser();
+  
+  const { mutate, isLoading: isPosting} = api.recipe.delete.useMutation({
+    // If delete is successfull invalidate getall to remove deleted post
+    // IDK IF I NEED THIS
+    onSuccess: async () => {
+      void ctx.recipe.getAll.invalidate();
+      window.location.href = `/${username}`;
+    },
+    // If something goes wrong with post or zod denies content, post message
+    onError: (e) => {
+      // Grabs error message from zod and prints it
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage && errorMessage[0]) {
+        toast.error(errorMessage[0]);
+      } else { // If there is no error message, shows default message
+        toast.error("Failed to delete. Please try again later.");
+      }
+    },
+  });
+
   if (!username || typeof username !== "string") return <div>Invalid username</div>
   if (!id || typeof id !== "string") return <div>Invalid recipe id</div>
   const { data } = api.recipe.getByUsernameAndId.useQuery({ // Wont let me destruct??
@@ -24,6 +48,16 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
   if (!data) return <div>Recipe not found</div>
   if (!data.recipe.pics[0]) return <div>404</div>
 
+  const ownsPost = viewer.user?.id == data.author.id;
+
+
+  const deleteHandler = () => {
+    if (!ownsPost) {
+      toast.error("You can't delete this post.");
+      return;
+    }
+    mutate({recipeId: id});
+  }
 
   return (
     <>
@@ -39,6 +73,16 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
           <p>{data.recipe.description}</p>
           <br/>
           <p>{data.recipe.instructions}</p>
+          {ownsPost ? (
+            <div>
+              <button className = "bg-rose-500" onClick={deleteHandler}>
+                Delete
+              </button>
+            </div>
+          ) : (
+            <div></div>
+          )}
+          
         </main>
         
       </PageLayout>

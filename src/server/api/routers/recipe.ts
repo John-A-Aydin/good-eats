@@ -273,7 +273,7 @@ export const recipeRouter = createTRPCRouter({
     if (!recipe_to_delete) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: "Author for recipe not found",
+        message: "Recipe not found",
       });
     }
     // Checking for ownership of post
@@ -300,6 +300,9 @@ export const recipeRouter = createTRPCRouter({
       }
       return id;
     })
+    console.log("\n\n\n\n\n\n\n");
+    console.log(keys);
+    console.log("\n\n\n\n\n")
     // TODO get AWS ids from pic urls
     const bucketParams = {Bucket: env.AWS_RECIPE_BUCKET_NAME}
     keys.map(async (key) => {
