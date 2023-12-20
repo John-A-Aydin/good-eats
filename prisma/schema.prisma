@@ -31,9 +31,9 @@ model Recipe {
 }
 
 model RecipePic {  // CAREFULL: untested
-    url           String   @id
+    url           String   @id @unique
     recipe        Recipe   @relation(fields: [recipeId], references: [id])
-    recipeId      String   @unique
+    recipeId      String   
 
     @@index([recipeId])
 }

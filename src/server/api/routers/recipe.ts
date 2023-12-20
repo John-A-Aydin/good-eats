@@ -8,7 +8,8 @@ import { filterUserForClient } from "~/server/helpers/filterUserForClient";
 import { env } from "~/env.mjs";
 import S3 from "aws-sdk/clients/s3";
 import { createId } from "@paralleldrive/cuid2";
-import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 type RecipesWithPics = (
   {
@@ -42,15 +43,6 @@ type RecipesWithPics = (
 
 const UPLOAD_MAX_FILE_SIZE = 1_000_000;
 const bucket_name = env.AWS_RECIPE_BUCKET_NAME;
-
-// TODO web dev cody vid figure out wtf is going on
-const s3 = new S3({
-  apiVersion: "2006-03-01",
-  accessKeyId: env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
-  region: "us-east-1",
-  signatureVersion: 'v4',
-});
 
 const s3Client = new S3Client({
   region: "us-east-1",
@@ -178,7 +170,7 @@ export const recipeRouter = createTRPCRouter({
         name: z.string().min(1).max(64),
         description: z.string().min(1).max(255),
         instructions: z.string(),
-        imageTypes: z.string().array(),
+        numPics: z.number(),
         nutrition: z.object({
           carbs: z.number(),
           protien: z.number(),
@@ -218,16 +210,15 @@ export const recipeRouter = createTRPCRouter({
       POSSIBLE ISSUE: If the client fails to upload pictures after mutation is called,
       there will be imageIds in the database with no image associated with their url.
      */
-    
-    const unawaitedPresignedURLArray = input.imageTypes.map(async (type) => {
+    const unawaitedPresignedURLArray : Array<Promise<string>> = [];
+    for (let i = 0; i < input.numPics; i++) {
       // Creating presigned url
       const id = createId();
-      const params = ({
+      const command = new PutObjectCommand({
         Bucket: env.AWS_RECIPE_BUCKET_NAME,
-        Key: id,
-        Expires: 1800, // 30 minutes (may need to change)
-      }) // May need to add beck content type
-      const presignedURL = s3.getSignedUrl('putObject', params);
+        Key: id
+      });
+      const presignedURL =  getSignedUrl(s3Client, command, { expiresIn: 60 });
       
       if(!presignedURL) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
       // Creates image data in database
@@ -241,9 +232,9 @@ export const recipeRouter = createTRPCRouter({
           },
         },
       });
-      return presignedURL;
-    });
-
+      unawaitedPresignedURLArray.push(presignedURL);
+      
+    }
     const presignedURLArray = await Promise.all(unawaitedPresignedURLArray);
 
     await ctx.prisma.nutrition.create({

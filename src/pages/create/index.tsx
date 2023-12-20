@@ -15,7 +15,7 @@ type T_postInfo = {
   name: string;
   description: string;
   instructions: string;
-  imageTypes: string[];
+  numPics: number;
   nutrition: {
     carbs: number;
     fat: number;
@@ -34,7 +34,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     name: "",
     description: "",
     instructions: "",
-    imageTypes: [],
+    numPics: 0,
     nutrition: {
       carbs: 0,
       protien: 0,
@@ -53,9 +53,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
       for (let index = 0; index < selectedImageFiles.length; index++) {
         const presignedURL = variables.presignedURLArray[index];
         const imageFile = selectedImageFiles[index];
-        console.log(presignedURL);
         if (!presignedURL || !imageFile) return;
-        console.log(imageFile);
         const temp = await axios.put(presignedURL, imageFile);
         console.log(temp);
       }
@@ -63,7 +61,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
         name: "",
         description: "",
         instructions: "",
-        imageTypes: [],
+        numPics: 0,
         nutrition: {
           carbs: 0,
           protien: 0,
@@ -158,7 +156,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     setSelectedImageURLs((prev) => prev.concat(imagesArray));
     setSelectedImageFiles((prev) => prev.concat(selectedFilesArray));
     setPostInfo((prev) => {
-      return {...prev, imageTypes: prev.imageTypes.concat(imageTypes)};
+      return {...prev, numPics: prev.numPics + 1};
     });
     // FOR BUG IN CHROME
     e.target.value = "";
@@ -169,7 +167,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     setSelectedImageFiles((prev) => prev.splice(index, 1));
     
     setPostInfo((prev) => {
-      return {...prev, imageTypes: prev.imageTypes.splice(index, 1)};
+      return {...prev, numPics: prev.numPics - 1};
     });
     URL.revokeObjectURL(imageURL);
   }

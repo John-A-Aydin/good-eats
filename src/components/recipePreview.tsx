@@ -81,9 +81,9 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
     </div>
     <Carousell pics={recipe.pics} link={`/${author.username}/${recipe.id}`}/>
     <div className="flex flex-row justify-evenly">
-      <p className="w-full">{recipe.description}</p>
+      <p className="w-80">{recipe.description}</p>
       { recipe.nutrition ? (
-        <>
+        <div className="flex flex-row">
         <PieChart size={100} carbs={recipe.nutrition.carbs} protien={recipe.nutrition.protien} fat={recipe.nutrition.fat}/>
         <div className="flex flex-col mt-2 w-full">
           <div className="flex flex-row py-2">
@@ -99,7 +99,7 @@ export const RecipePreview = (props: RecipeWithPicsAndAuthor) => {
             <span className="px-2">{`Fat: ${recipe.nutrition.fat} g`}</span>
           </div>
         </div>
-        </>
+        </div>
       ) : (
         <div>No nutrition info</div>
       )}
