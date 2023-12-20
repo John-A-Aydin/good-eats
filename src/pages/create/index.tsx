@@ -15,12 +15,13 @@ type T_postInfo = {
   name: string;
   description: string;
   instructions: string;
-  imageTypes: string[];
+  numPics: number;
   nutrition: {
     carbs: number;
     fat: number;
     protien: number;
   };
+  tags: string[];
 };
 
 const CreateRecipeWizard = () => { // TODO clear input fields on submit
@@ -33,12 +34,13 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     name: "",
     description: "",
     instructions: "",
-    imageTypes: [],
+    numPics: 0,
     nutrition: {
       carbs: 0,
       protien: 0,
       fat: 0,
     },
+    tags: [],
   });
   const [selectedImageURLs, setSelectedImageURLs] = useState<string[]>([]);
   const [selectedImageFiles, setSelectedImageFiles] = useState<File[]>([]);
@@ -51,9 +53,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
       for (let index = 0; index < selectedImageFiles.length; index++) {
         const presignedURL = variables.presignedURLArray[index];
         const imageFile = selectedImageFiles[index];
-        console.log(presignedURL);
         if (!presignedURL || !imageFile) return;
-        console.log(imageFile);
         const temp = await axios.put(presignedURL, imageFile);
         console.log(temp);
       }
@@ -61,12 +61,13 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
         name: "",
         description: "",
         instructions: "",
-        imageTypes: [],
+        numPics: 0,
         nutrition: {
           carbs: 0,
           protien: 0,
           fat: 0,
         },
+        tags: [],
       });
       void ctx.recipe.getAll.invalidate();
 
@@ -155,7 +156,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     setSelectedImageURLs((prev) => prev.concat(imagesArray));
     setSelectedImageFiles((prev) => prev.concat(selectedFilesArray));
     setPostInfo((prev) => {
-      return {...prev, imageTypes: prev.imageTypes.concat(imageTypes)};
+      return {...prev, numPics: prev.numPics + 1};
     });
     // FOR BUG IN CHROME
     e.target.value = "";
@@ -166,7 +167,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     setSelectedImageFiles((prev) => prev.splice(index, 1));
     
     setPostInfo((prev) => {
-      return {...prev, imageTypes: prev.imageTypes.splice(index, 1)};
+      return {...prev, numPics: prev.numPics - 1};
     });
     URL.revokeObjectURL(imageURL);
   }
@@ -184,9 +185,9 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
           <link rel="icon" href="/favicon.jpg" /> 
       </Head>
       
-      <div className="bg-neutral-900 h-screen mx-24 pt-4">
+      <div className="flex flex-col bg-neutral-900 h-screen px-24 w-screen pt-4">
         
-          <form onSubmit={handleSubmit} className="flex flex-row rounded-md w-full mb-4">
+          <form onSubmit={handleSubmit} className="flex flex-row rounded-md w-full max-w-6xl mb-4 justify-self-center">
             <div className="flex flex-col w-full">
               <h3>Name :</h3>
               <textarea
@@ -243,6 +244,12 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
                 />
               </div>
             </div>
+            {/* <div>
+              Tags:
+              <div className="bg-neutral-800 w-40 rounded-md m-4 py-1 px-4 border-[1px] border-gray-400">
+                
+              </div>
+            </div> */}
           </form>
           
         

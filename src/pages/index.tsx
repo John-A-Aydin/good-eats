@@ -5,17 +5,16 @@ import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { api } from "~/utils/api";
 import { RecipePreview } from "~/components/recipePreview";
 import { PageLayout } from "~/components/layout";
-import { PieChart } from "~/components/pieChart";
 
 
 const Feed = () => {
   const {data, isLoading: postsLoading } = api.recipe.getAll.useQuery();
 
   if (postsLoading) return <LoadingPage />
-
   if (!data) return <div>Something went wrong</div>
+  if (data.length == 0) return <div className="text-2xl w-80" >Currently refactoring data, stay tuned for an update.</div>
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
       {data.map((fullRecipe) => (
         <RecipePreview {...fullRecipe} key={fullRecipe.recipe.id}/>
         
@@ -46,7 +45,6 @@ const Home: NextPage = () => {
           <SignIn/>
           <Feed />
         </main>
-        <PieChart size={50} carbs={10} protien={15} fat={6}/>
       </PageLayout>
       
     </>

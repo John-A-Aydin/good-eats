@@ -8,6 +8,8 @@ import { filterUserForClient } from "~/server/helpers/filterUserForClient";
 import { env } from "~/env.mjs";
 import S3 from "aws-sdk/clients/s3";
 import { createId } from "@paralleldrive/cuid2";
+import { S3Client, DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 type RecipesWithPics = (
   {
@@ -40,14 +42,14 @@ type RecipesWithPics = (
 */
 
 const UPLOAD_MAX_FILE_SIZE = 1_000_000;
+const bucket_name = env.AWS_RECIPE_BUCKET_NAME;
 
-// TODO web dev cody vid figure out wtf is going on
-const s3 = new S3({
-  apiVersion: "2006-03-01",
-  accessKeyId: env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+const s3Client = new S3Client({
   region: "us-east-1",
-  signatureVersion: 'v4',
+  credentials: {
+    accessKeyId: env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+  }
 });
 
 const addUserDataToRecipes = async (recipes: RecipesWithPics[]) => {
@@ -168,12 +170,13 @@ export const recipeRouter = createTRPCRouter({
         name: z.string().min(1).max(64),
         description: z.string().min(1).max(255),
         instructions: z.string(),
-        imageTypes: z.string().array(),
+        numPics: z.number(),
         nutrition: z.object({
           carbs: z.number(),
           protien: z.number(),
           fat: z.number(),
         }),
+        tags: z.string().array(),
         // TODO change up the nutrion formating
       })
     )
@@ -207,20 +210,19 @@ export const recipeRouter = createTRPCRouter({
       POSSIBLE ISSUE: If the client fails to upload pictures after mutation is called,
       there will be imageIds in the database with no image associated with their url.
      */
-    
-    const unawaitedPresignedURLArray = input.imageTypes.map(async (type) => {
+    const unawaitedPresignedURLArray : Array<Promise<string>> = [];
+    for (let i = 0; i < input.numPics; i++) {
       // Creating presigned url
       const id = createId();
-      const params = ({
+      const command = new PutObjectCommand({
         Bucket: env.AWS_RECIPE_BUCKET_NAME,
-        Key: id,
-        Expires: 1800, // 30 minutes (may need to change)
-      }) // May need to add beck content type
-      const presignedURL = s3.getSignedUrl('putObject', params);
+        Key: id
+      });
+      const presignedURL = getSignedUrl(s3Client, command, { expiresIn: 60 });
       
-      if(!presignedURL) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
+      // if(!presignedURL) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
       // Creates image data in database
-      await ctx.prisma.recipePics.create({
+      await ctx.prisma.recipePic.create({
         data: {
           url: `${env.AWS_RECIPE_BUCKET_URL}${id}`,
           recipe: {
@@ -230,9 +232,9 @@ export const recipeRouter = createTRPCRouter({
           },
         },
       });
-      return presignedURL;
-    });
-
+      unawaitedPresignedURLArray.push(presignedURL);
+      
+    }
     const presignedURLArray = await Promise.all(unawaitedPresignedURLArray);
 
     await ctx.prisma.nutrition.create({
@@ -249,5 +251,61 @@ export const recipeRouter = createTRPCRouter({
     });
     
     return {post, presignedURLArray};
+  }),
+  delete: privateProcedure
+    .input(z.object({ recipeId: z.string() }))
+    .mutation(async ({ctx, input}) => {
+      const recipe_to_delete = await ctx.prisma.recipe.findUnique({
+        where: { id: input.recipeId },
+        include: { pics: true, nutrition: true, },
+    });
+    // Checking to make sure the recipe actually exists
+    // Might need to change trpc error to just a return idrk
+    if (!recipe_to_delete) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Recipe not found",
+      });
+    }
+    // Checking for ownership of post
+    if (ctx.userId != recipe_to_delete.authorId) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "This is not your post",
+      })
+    }
+    await ctx.prisma.nutrition.delete({
+      where: {recipeId: recipe_to_delete.id}
+    })
+    // Stupidly ineffecient
+    const keys : string[] = recipe_to_delete.pics.map((recipePic) => {
+      const url = recipePic.url;
+      let id = "";
+      for (let i = url.length - 1; i >= 0; i--) {
+        if (url.charAt(i) != '/') {
+          let temp : string = url.charAt(i);
+          id = temp += id;
+        } else {
+          return id;
+        }
+      }
+      return id;
+    })
+    // TODO get AWS ids from pic urls
+    const bucketParams = {Bucket: env.AWS_RECIPE_BUCKET_NAME}
+    keys.map(async (key) => {
+      await s3Client.send(new DeleteObjectCommand({
+        Bucket: env.AWS_RECIPE_BUCKET_NAME,
+        Key: key,
+      }))
+    })
+    // Deleting pic info from db
+    await ctx.prisma.recipePic.deleteMany({
+      where: {recipeId: recipe_to_delete.id}
+    })
+    // Deleting rest of post
+    await ctx.prisma.recipe.delete({
+      where: {id: recipe_to_delete.id}
+    })
   }),
 });

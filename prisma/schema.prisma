@@ -21,22 +21,19 @@ model Recipe {
     description  String   @db.VarChar(255)
     instructions String
 
-    pics         RecipePics[] 
-
-    // TODO - Make nutrition info either seperate model with relation or an object
+    pics         RecipePic[]
     
     nutrition Nutrition? // TODO make required?
     // TODO tags?
-    
+    tags         PostTag[]
 
     @@index([authorId])
-    // TODO figure out what this actually does 
 }
 
-model RecipePics {  // CAREFULL: untested
-    url           String   @id
+model RecipePic {  // CAREFULL: untested
+    url           String   @id @unique
     recipe        Recipe   @relation(fields: [recipeId], references: [id])
-    recipeId      String   @unique
+    recipeId      String   
 
     @@index([recipeId])
 }
@@ -46,11 +43,26 @@ model Nutrition {
     protien     Float
     fat         Float
     recipeId    String  @id @unique
-    recipe Recipe @relation(fields: [recipeId], references: [id])
+    recipe      Recipe  @relation(fields: [recipeId], references: [id])
 
     @@index([recipeId])
 }
 
+model Tag {
+    name     String  @id @unique
+    recipes     PostTag[]   
+}
 
+model PostTag { // Intermediary table for the m2m recipe and tag relation
+
+    tagName     String
+    tag         Tag     @relation(fields: [tagName], references: [name])
+
+    recipeId    String
+    recipe      Recipe  @relation(fields: [recipeId], references: [id])
+
+    @@index([tagName, recipeId])
+    @@id([recipeId, tagName])
+}
 
 
