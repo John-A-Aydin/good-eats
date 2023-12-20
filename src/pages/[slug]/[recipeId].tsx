@@ -9,6 +9,7 @@ import { useRouter } from "next/router"
 import { api } from "~/utils/api"; 
 import { Carousell } from "~/components/imageCarousell";
 import { useUser } from "@clerk/nextjs";
+import { assert } from "console";
 
 
 
@@ -16,14 +17,17 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
   const router = useRouter();
   const params = router.query;
   const username = params.slug;
+
   const id = params.recipeId;
   const ctx = api.useContext();
   const viewer = useUser();
   
+  if (!username || typeof username !== "string") return <div>Invalid username</div>
+  
   const { mutate, isLoading: isPosting} = api.recipe.delete.useMutation({
     // If delete is successfull invalidate getall to remove deleted post
     // IDK IF I NEED THIS
-    onSuccess: async () => {
+    onSuccess: () => {
       void ctx.recipe.getAll.invalidate();
       window.location.href = `/${username}`;
     },
@@ -39,7 +43,7 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
     },
   });
 
-  if (!username || typeof username !== "string") return <div>Invalid username</div>
+  
   if (!id || typeof id !== "string") return <div>Invalid recipe id</div>
   const { data } = api.recipe.getByUsernameAndId.useQuery({ // Wont let me destruct??
     id,

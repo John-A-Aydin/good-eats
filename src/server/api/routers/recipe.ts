@@ -218,9 +218,9 @@ export const recipeRouter = createTRPCRouter({
         Bucket: env.AWS_RECIPE_BUCKET_NAME,
         Key: id
       });
-      const presignedURL =  getSignedUrl(s3Client, command, { expiresIn: 60 });
+      const presignedURL = getSignedUrl(s3Client, command, { expiresIn: 60 });
       
-      if(!presignedURL) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
+      // if(!presignedURL) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
       // Creates image data in database
       await ctx.prisma.recipePic.create({
         data: {
@@ -280,7 +280,7 @@ export const recipeRouter = createTRPCRouter({
     // Stupidly ineffecient
     const keys : string[] = recipe_to_delete.pics.map((recipePic) => {
       const url = recipePic.url;
-      let id : string = "";
+      let id = "";
       for (let i = url.length - 1; i >= 0; i--) {
         if (url.charAt(i) != '/') {
           let temp : string = url.charAt(i);
@@ -291,9 +291,6 @@ export const recipeRouter = createTRPCRouter({
       }
       return id;
     })
-    console.log("\n\n\n\n\n\n\n");
-    console.log(keys);
-    console.log("\n\n\n\n\n")
     // TODO get AWS ids from pic urls
     const bucketParams = {Bucket: env.AWS_RECIPE_BUCKET_NAME}
     keys.map(async (key) => {
