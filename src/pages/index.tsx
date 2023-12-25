@@ -31,7 +31,7 @@ const Home: NextPage = () => {
   api.recipe.getAll.useQuery();
   
   // Return empty div if both aren't loaded, since user tends to load faster
-  if (!userLoaded) return <LoadingPage />;
+  // if (!userLoaded) return <LoadingPage />;
 
   return (
     <>
@@ -42,7 +42,6 @@ const Home: NextPage = () => {
       </Head>
       <PageLayout>
         <main className="flex flex-col items-center">
-          <SignIn/>
           <Feed />
         </main>
       </PageLayout>

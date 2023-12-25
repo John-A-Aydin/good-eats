@@ -269,7 +269,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
               name="images"
               onChange={onSelectFile}
               multiple
-              accept="image/png , image/jpeg, image/webp"
+              accept="image/png , image/jpeg, image/webp, image/heic"
             />
             <br/>
           </label>
