@@ -8,19 +8,22 @@ import { SignInButton } from "./signinButton";
 const SignedInSidebar = () => {
   return ( // TODO create recipe route may change
     <div className="flex flex-col">
-      <div className="flex flex-row"> 
+      <div className="flex flex-row py-1"> 
         <Link href="/">
           <Image src="/home-icon.png" alt="oops" width={50} height={50}/>
         </Link>
-        <div className="h-full">
-          Hello
-        </div>
+        <span className="pt-3 pl-4 text-xl font-normal">
+          Home
+        </span>
       </div>
-      <Link href="/create">
-        <Image src="/createButton.png" alt="Create" width={50} height={50}/>
-      </Link>
-      
-      <UserButton />
+      <div className="flex flex-row py-1">
+        <Link href="/create">
+          <Image src="/createButton.png" alt="Create" width={50} height={50}/>
+        </Link>
+        <span className="pt-3 pl-4 text-xl font-normal">
+            Create
+        </span>
+      </div>
       <SignInButton/>
     </div>
   );
