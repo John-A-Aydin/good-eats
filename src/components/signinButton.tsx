@@ -5,9 +5,10 @@ import { useState } from "react";
 
 export const SignInButton = () => {
   const user = useUser();
-  if (user.isSignedIn) return (<UserButton/>);
 
   const [signingIn, setSigningIn] = useState<boolean>(false);
+
+  if (user.isSignedIn) return (<UserButton/>);
 
   const SignInHandler = () => {
     setSigningIn(true);
