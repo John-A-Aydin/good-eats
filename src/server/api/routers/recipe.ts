@@ -8,6 +8,7 @@ import { filterUserForClient } from "~/server/helpers/filterUserForClient";
 import { env } from "~/env.mjs";
 import S3 from "aws-sdk/clients/s3";
 import { createId } from "@paralleldrive/cuid2";
+// import ObjectID from "uniqid";
 import { S3Client, DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -213,10 +214,11 @@ export const recipeRouter = createTRPCRouter({
     const unawaitedPresignedURLArray : Array<Promise<string>> = [];
     for (let i = 0; i < input.numPics; i++) {
       // Creating presigned url
-      const id = createId();
+      const name = createId();
+      //const id = ObjectID();
       const command = new PutObjectCommand({
         Bucket: env.AWS_RECIPE_BUCKET_NAME,
-        Key: id
+        Key: name
       });
       const presignedURL = getSignedUrl(s3Client, command, { expiresIn: 60 });
       
@@ -224,7 +226,7 @@ export const recipeRouter = createTRPCRouter({
       // Creates image data in database
       await ctx.prisma.recipePic.create({
         data: {
-          url: `${env.AWS_RECIPE_BUCKET_URL}${id}`,
+          url: `${env.AWS_RECIPE_BUCKET_URL}${name}`,
           recipe: {
             connect: {
               id: post.id,

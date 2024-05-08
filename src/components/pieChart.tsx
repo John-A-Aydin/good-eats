@@ -8,6 +8,8 @@ export const PieChart = (props: {size: number, carbs: number, fat: number, proti
   // if (!size || size < 10) 
   //   size = 100;
 
+  if (props.carbs == 0 && props.fat == 0 && props.protien == 0) return (<div></div>)
+
   const total = props.carbs + props.fat + props.protien;
   const protienAndCarbsRatio = (props.protien+props.carbs)/total;
   const protienRatio = props.protien/total;

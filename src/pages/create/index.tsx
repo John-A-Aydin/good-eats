@@ -128,6 +128,8 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
       toast.error("Please write some instructions.");
     } else if (!selectedImageFiles[0]) {
       toast.error("Please upload some pictures of your dish.");
+    } else if (postInfo.nutrition.carbs < 0 || postInfo.nutrition.protien < 0 || postInfo.nutrition.fat < 0){
+      toast.error("Make sure the nutrients are positive");
     } else {
       mutate(postInfo);
     }
@@ -142,7 +144,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     // Grabbing 
     if (!e.target.files) return;
     
-
+    console.log(selectedImageURLs);
     const selectedFilesArray = Array.from(e.target.files);
     const imageTypes : string[] = []
 
@@ -161,11 +163,15 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
     // FOR BUG IN CHROME
     e.target.value = "";
   }
-  function deleteHandler(imageURL : string) {
-    const index = selectedImageURLs.indexOf(imageURL);
-    setSelectedImageURLs((prev) => prev.splice(index, 1));
-    setSelectedImageFiles((prev) => prev.splice(index, 1));
+
+  function deleteHandler(imageURL : string, index: number) {
+    // setSelectedImageURLs((prev) => prev.splice(index, 1));
+    // setSelectedImageFiles((prev) => prev.splice(index, 1));
+    // This feels illegal
+    selectedImageURLs.splice(index, 1);
+    selectedImageFiles.splice(index, 1);
     
+    console.log(selectedImageURLs);
     setPostInfo((prev) => {
       return {...prev, numPics: prev.numPics - 1};
     });
@@ -185,7 +191,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
           <link rel="icon" href="/favicon.jpg" /> 
       </Head>
       
-      <div className="flex flex-col bg-neutral-900 h-screen px-24 w-screen pt-4">
+      <div className="flex flex-col bg-neutral-900 h-full px-24 w-full pt-4">
         
           <form onSubmit={handleSubmit} className="flex flex-row rounded-md w-full max-w-6xl mb-4 justify-self-center">
             <div className="flex flex-col w-full">
@@ -263,7 +269,7 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
               name="images"
               onChange={onSelectFile}
               multiple
-              accept="image/png , image/jpeg, image/webp"
+              accept="image/png , image/jpeg, image/webp, image/heic"
             />
             <br/>
           </label>
@@ -280,22 +286,14 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
                 </span>
               </p>
             ) : (
-              <button
-                className="upload-btn"
-                onClick={() => {
-                  console.log(selectedImageURLs);
-                }}
-              >
-                upload {selectedImageURLs.length} images
-                {selectedImageURLs.length === 1 ? "" : "S"}
-              </button>
+              <div></div>
           ))}
 
           <div className="grid w-full">
             {selectedImageURLs &&
               selectedImageURLs.map((image, index) => {
                 return (
-                  <div key={image} className="w-1/3">
+                  <div key={image} className="w-1/3 m-4">
                     <img
                       className=""
                       src={image}
@@ -303,8 +301,8 @@ const CreateRecipeWizard = () => { // TODO clear input fields on submit
                       alt="upload"
                     />
                     <button 
-                      onClick={() => deleteHandler(image)}
-                      className="bg-rose-500 p-1 rounded-md"
+                      onClick={() => deleteHandler(image, index)}
+                      className="bg-rose-500 p-1 my-4 rounded-md"
                     >
                       delete
                     </button>

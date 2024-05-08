@@ -6,63 +6,62 @@ generator client {
 }
 
 datasource db {
-    provider = "mysql"
+    provider = "mongodb"
     url      = env("DATABASE_URL")
-    relationMode = "prisma"
 }
 
 model Recipe {
-    id           String   @id @default(cuid())
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
     authorId     String
-    name         String   @db.VarChar(64)
+    name         String   
 
     createdAt    DateTime @default(now())
     starRating   Float    @default(0.0)
-    description  String   @db.VarChar(255)
+    description  String   
     instructions String
 
     pics         RecipePic[]
     
     nutrition Nutrition? // TODO make required?
     // TODO tags?
-    tags         PostTag[]
+    // tags         PostTag[]
 
     @@index([authorId])
 }
 
 model RecipePic {  // CAREFULL: untested
-    url           String   @id @unique
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    url           String   
     recipe        Recipe   @relation(fields: [recipeId], references: [id])
-    recipeId      String   
+    recipeId      String   @db.ObjectId
 
     @@index([recipeId])
 }
 
 model Nutrition {
+    id          String  @id @default(auto()) @map("_id") @db.ObjectId
     carbs       Float
     protien     Float
     fat         Float
-    recipeId    String  @id @unique
+    recipeId    String  @db.ObjectId @unique
     recipe      Recipe  @relation(fields: [recipeId], references: [id])
-
-    @@index([recipeId])
 }
 
-model Tag {
-    name     String  @id @unique
-    recipes     PostTag[]   
-}
+// model Tag {
+//     name     String  @id @map("_id")
+//     recipes     PostTag[]   
+// }
 
-model PostTag { // Intermediary table for the m2m recipe and tag relation
+// model PostTag { // Intermediary table for the m2m recipe and tag relation
 
-    tagName     String
-    tag         Tag     @relation(fields: [tagName], references: [name])
+//     tagName     String
+//     tag         Tag     @relation(fields: [tagName], references: [name])
 
-    recipeId    String
-    recipe      Recipe  @relation(fields: [recipeId], references: [id])
+//     recipeId    String
+//     recipe      Recipe  @relation(fields: [recipeId], references: [id])
 
-    @@index([tagName, recipeId])
-    @@id([recipeId, tagName])
-}
+//     @@index([tagName, recipeId])
+//     @@id([recipeId, tagName])
+// }
 
 

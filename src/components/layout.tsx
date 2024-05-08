@@ -2,21 +2,43 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
+import { SignInButton } from "./signinButton";
 
 
-const SignedInHeader = () => {
-
+const SignedInSidebar = () => {
   return ( // TODO create recipe route may change
     <div className="flex flex-col">
-      <br/>
-      <Link href="/create">
-        <Image src="/createButton.png" alt="Create" width={50} height={50}/>
-      </Link>
-      <br/>
-      <UserButton />
+      <div className="flex flex-row py-1"> 
+        <Link href="/">
+          <Image src="/home-icon.png" alt="oops" width={50} height={50}/>
+        </Link>
+        <span className="pt-3 pl-4 text-xl font-normal">
+          Home
+        </span>
+      </div>
+      <div className="flex flex-row py-1">
+        <Link href="/create">
+          <Image src="/createButton.png" alt="Create" width={50} height={50}/>
+        </Link>
+        <span className="pt-3 pl-4 text-xl font-normal">
+            Create
+        </span>
+      </div>
+      <SignInButton/>
     </div>
   );
 };
+
+const NotSignedInSidebar = () => {
+  return (
+    <div className="flex flex-col">
+      <Link href="/">
+        <Image src="/home-icon.png" alt="oops" width={50} height={50}/>
+      </Link>
+      <SignInButton/>
+    </div>
+  )
+}
 
 export const PageLayout= (props: PropsWithChildren) => {
   const { isSignedIn } = useUser();
@@ -24,10 +46,12 @@ export const PageLayout= (props: PropsWithChildren) => {
     <main className="flex flex-row justify-center">
       {/* {overflow-y-scroll} */}
       <div className="h-screen w-2/12 fixed top-0 left-0 flex flex-col p-8">
-        <Link href="/">
-          <Image src = "/home-icon.png" alt="oops" width={50} height={50}/>
-        </Link>
-        {isSignedIn && (<SignedInHeader />)}
+        {isSignedIn ? (
+          <SignedInSidebar/>
+        ) : (
+          <NotSignedInSidebar/>
+        )
+        }
       </div>
       <div className="h-full w-8/12 border-x border-neutral-600 md:max-w-2xl">
         {props.children}
