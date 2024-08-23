@@ -22,6 +22,7 @@ export const LoadingPage = () => {
   return (
       <div className="absolute top-0 right-0 flex w-screen h-screen justify-center items-center">
           <LoadingSpinner size={60}/>
+          <p>(Database might be sleeping)</p>
       </div>
   );
 };
