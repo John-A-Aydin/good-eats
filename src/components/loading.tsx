@@ -20,7 +20,7 @@ export const LoadingSpinner = (props: {size?: number}) => {
 
 export const LoadingPage = () => {
   return (
-      <div className="absolute top-0 right-0 flex w-screen h-screen justify-center items-center">
+      <div className="absolute top-0 right-0 flex w-screen h-screen justify-center items-center flex flex-col">
           <LoadingSpinner size={60}/>
           <p>(Database might be sleeping)</p>
       </div>
