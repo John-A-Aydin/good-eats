@@ -6,7 +6,6 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { filterUserForClient } from "~/server/helpers/filterUserForClient";
 
 import { env } from "~/env.mjs";
-import S3 from "aws-sdk/clients/s3";
 import { createId } from "@paralleldrive/cuid2";
 // import ObjectID from "uniqid";
 import { S3Client, DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -18,7 +17,7 @@ type RecipesWithPics = (
       url: string;
       recipeId: string;
     }[];
-    nutrition: { 
+    nutrition: {
       recipeId: string;
       carbs: number;
       protien: number;
@@ -39,7 +38,7 @@ type RecipesWithPics = (
   TODO's
    - Ratelimit
    - Add nutrition parame in create
-   - 
+   -
 */
 
 const UPLOAD_MAX_FILE_SIZE = 1_000_000;
@@ -64,18 +63,18 @@ const addUserDataToRecipes = async (recipes: RecipesWithPics[]) => {
   return recipes.map(recipe => {
     const author = users.find((user) => user.id === recipe.authorId);
 
-    if (!author ) 
+    if (!author )
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Author for recipe not found"
       });
-    
+
     if ( !author.username ) // TODO require username entry for new signins
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Author has no username"
       });
-    
+
     return {
       recipe,
       author: {
@@ -165,7 +164,7 @@ export const recipeRouter = createTRPCRouter({
       };
   }),
   create: privateProcedure
-    .input( 
+    .input(
       // zod input validation
       z.object({
         name: z.string().min(1).max(64),
@@ -182,18 +181,18 @@ export const recipeRouter = createTRPCRouter({
       })
     )
     .mutation(async({ctx, input}) => {
-    /** 
+    /**
      * Grabbing the current user's ID.
      * Since this is a private procedure and we made sure the current user exists
      * ../trcp.ts enforceUserIsAuthed()
     */
     const authorId = ctx.userId;
-    
-    
+
+
     // TODO Rate limiting on posts
     // const { success } = await ratelimit.limit(authorId);
     // if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" })
-    
+
     const post = await ctx.prisma.recipe.create({
       data: {
         authorId,
@@ -221,7 +220,7 @@ export const recipeRouter = createTRPCRouter({
         Key: name
       });
       const presignedURL = getSignedUrl(s3Client, command, { expiresIn: 60 });
-      
+
       // if(!presignedURL) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR"});
       // Creates image data in database
       await ctx.prisma.recipePic.create({
@@ -235,7 +234,7 @@ export const recipeRouter = createTRPCRouter({
         },
       });
       unawaitedPresignedURLArray.push(presignedURL);
-      
+
     }
     const presignedURLArray = await Promise.all(unawaitedPresignedURLArray);
 
@@ -251,7 +250,7 @@ export const recipeRouter = createTRPCRouter({
         }
       }
     });
-    
+
     return {post, presignedURLArray};
   }),
   delete: privateProcedure
