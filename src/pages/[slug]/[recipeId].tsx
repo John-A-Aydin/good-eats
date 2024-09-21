@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 import { useRouter } from "next/router"
 
-import { api } from "~/utils/api"; 
+import { api } from "~/utils/api";
 import { Carousell } from "~/components/imageCarousell";
 import { useUser } from "@clerk/nextjs";
 import { assert } from "console";
@@ -21,9 +21,10 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
   const id = params.recipeId;
   const ctx = api.useContext();
   const viewer = useUser();
-  
+
   if (!username || typeof username !== "string") return <div>Invalid username</div>
-  
+
+
   const { mutate, isLoading: isPosting} = api.recipe.delete.useMutation({
     // If delete is successfull invalidate getall to remove deleted post
     // IDK IF I NEED THIS
@@ -43,7 +44,7 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
     },
   });
 
-  
+
   if (!id || typeof id !== "string") return <div>Invalid recipe id</div>
   const { data } = api.recipe.getByUsernameAndId.useQuery({ // Wont let me destruct??
     id,
@@ -52,8 +53,9 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
   if (!data) return <div>Recipe not found</div>
   if (!data.recipe.pics[0]) return <div>404</div>
 
-  const ownsPost = viewer.user?.id == data.author.id;
+  console.log(data.recipe.instructions);
 
+  const ownsPost = viewer.user?.id == data.author.id;
 
   const deleteHandler = () => {
     if (!ownsPost) {
@@ -76,7 +78,11 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
           <Carousell pics={data.recipe.pics}/>
           <p>{data.recipe.description}</p>
           <br/>
-          <p>{data.recipe.instructions}</p>
+          <div className="p-4">
+            {data.recipe.instructions.split("\n").map((i, key) => {
+              return <p key={key}>{i}</p>
+            })}
+          </div>
           {ownsPost ? (
             <div>
               <button className = "bg-rose-500" onClick={deleteHandler}>
@@ -86,15 +92,15 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
           ) : (
             <div></div>
           )}
-          
+
         </main>
-        
+
       </PageLayout>
     </>
   );
-  
 
- 
+
+
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
