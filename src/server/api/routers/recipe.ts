@@ -4,12 +4,11 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/ap
 import { TRPCError } from "@trpc/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { filterUserForClient } from "~/server/helpers/filterUserForClient";
-
 import { env } from "~/env.mjs";
 import { createId } from "@paralleldrive/cuid2";
-// import ObjectID from "uniqid";
 import { S3Client, DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { formatInstructions } from "~/utils/instruction_format";
 
 type RecipesWithPics = (
   {
@@ -23,26 +22,17 @@ type RecipesWithPics = (
       protien: number;
       fat: number;
     } | null;
-  } & {
-    id: string;
-    authorId: string;
-    name: string;
-    createdAt: Date;
-    starRating: number;
-    description: string;
-    instructions: string;
-  }
+  } & Recipe
 )
 
 /*
   TODO's
    - Ratelimit
-   - Add nutrition parame in create
-   -
+   - Add nutrition param in create
+   - Enforce max file size
 */
 
 const UPLOAD_MAX_FILE_SIZE = 1_000_000;
-const bucket_name = env.AWS_RECIPE_BUCKET_NAME;
 
 const s3Client = new S3Client({
   region: "us-east-1",
@@ -84,9 +74,6 @@ const addUserDataToRecipes = async (recipes: RecipesWithPics[]) => {
     };
   });
 }
-
-
-
 
 export const recipeRouter = createTRPCRouter({
   getAll: publicProcedure
@@ -188,6 +175,7 @@ export const recipeRouter = createTRPCRouter({
     */
     const authorId = ctx.userId;
 
+      const formattedInstructions = formatInstructions(input.instructions);
 
     // TODO Rate limiting on posts
     // const { success } = await ratelimit.limit(authorId);
@@ -199,7 +187,7 @@ export const recipeRouter = createTRPCRouter({
         name: input.name,
         starRating: 0,
         description: input.description,
-        instructions: input.instructions,
+        instructions: formattedInstructions,
         // TODO change nutrition
       }
     })
@@ -293,7 +281,6 @@ export const recipeRouter = createTRPCRouter({
       return id;
     })
     // TODO get AWS ids from pic urls
-    const bucketParams = {Bucket: env.AWS_RECIPE_BUCKET_NAME}
     keys.map(async (key) => {
       await s3Client.send(new DeleteObjectCommand({
         Bucket: env.AWS_RECIPE_BUCKET_NAME,

@@ -11,6 +11,10 @@ import { Carousell } from "~/components/imageCarousell";
 import { useUser } from "@clerk/nextjs";
 import { assert } from "console";
 
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { formatInstructions } from "~/utils/instruction_format";
+
 
 
 const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
@@ -46,14 +50,12 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
 
 
   if (!id || typeof id !== "string") return <div>Invalid recipe id</div>
-  const { data } = api.recipe.getByUsernameAndId.useQuery({ // Wont let me destruct??
+  const { data } = api.recipe.getByUsernameAndId.useQuery({
     id,
     username,
   })
   if (!data) return <div>Recipe not found</div>
   if (!data.recipe.pics[0]) return <div>404</div>
-
-  console.log(data.recipe.instructions);
 
   const ownsPost = viewer.user?.id == data.author.id;
 
@@ -76,13 +78,12 @@ const SinglePostPage: NextPage<{ recipeId: string }> = ({ recipeId }) => {
         <main className="flex flex-col items-center">
           <h1 className="text-3xl font-semibold my-4">{data.recipe.name}</h1>
           <Carousell pics={data.recipe.pics}/>
-          <p>{data.recipe.description}</p>
-          <br/>
           <div className="p-4">
-            {data.recipe.instructions.split("\n").map((i, key) => {
-              return <p key={key}>{i}</p>
-            })}
+            <p>{data.recipe.description}</p>
+            <br/>
+            <Markdown remarkPlugins={[remarkGfm]}>{data.recipe.instructions}</Markdown>
           </div>
+
           {ownsPost ? (
             <div>
               <button className = "bg-rose-500" onClick={deleteHandler}>
